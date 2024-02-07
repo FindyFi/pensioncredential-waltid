@@ -56,7 +56,7 @@ async function showRequest(res) {
     if (resp.status == 200) {
      const status = await resp.json()
      if (status.verificationResult) {
-      console.log(JSON.stringify(obj, null, 1))
+      console.log(JSON.stringify(status, null, 1))
       const pre = document.createElement('pre')
       pre.innerHTML = JSON.stringify(status, null, 2)
       pre.style.textAlign = 'left'
