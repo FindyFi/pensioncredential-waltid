@@ -34,51 +34,10 @@ async function createRequest(id) {
   return credentialRequest
 }
 
-async function getStatus(id) {
-  const statusUrl = `${config.verifier_api}/openid4vc/session/${states[id]}`
-  const resp = await fetch(statusUrl)
-  const verificationStatus = await resp.json()
-  console.log(statusUrl, resp.status)
-  // console.log(statusUrl, resp.status, JSON.stringify(verificationStatus, null, 1))
-  return verificationStatus
-}
-
-const requestCredential = async function (req, res) {
-  const fullUrl = new URL(config.verifier_base + req.url)
-  let id = fullUrl.searchParams.get('id') || uuidv4()
-  console.log(fullUrl.pathname, fullUrl.searchParams.get('id'), id)
-  switch (fullUrl.pathname) {
-    case '/error':
-      res.setHeader("Content-Type", "text/plain")
-      res.writeHead(500)
-      res.end(`Virhe käsiteltäessä tapahtumaa ${id}`)
-      return false
-    case '/success':
-      const status = await getStatus(id)
-      console.log(id, status)
-      res.setHeader("Content-Type", "text/html")
-      res.writeHead(200)
-      res.end(`<!DOCTYPE html>
-<html>
- <meta charset="UTF-8">
- <body style="text-align: center;">
-  <h1>Tiedot tulivat perille!</h1>
-  <p>Todisteen tarkistuksen tila: <strong>${status.verificationResult}</strong></p>
-  <h2>Tiedot:</h2>
-  <pre style="text-align: left">${JSON.stringify(status.policyResults?.results[1].policies[0].result.credentialSubject, null, 1)}</pre>
- </body>
-</html>`)
-      return false
-  }
-  if (req.url !== '/') {
-    res.setHeader("Content-Type", "text/plain")
-    res.writeHead(404)
-    res.end(`Not Found`)
-    return false
-  }
+async function showRequest(res) {
+  const id = uuidv4()
   const credentialRequest = await createRequest(id)
   const dataURL = await QRCode.toDataURL(credentialRequest)
-
   res.setHeader("Content-Type", "text/html")
   res.writeHead(200)
   res.end(`<!DOCTYPE html>
@@ -90,18 +49,81 @@ const requestCredential = async function (req, res) {
   <p>Lähetäpä eläketodiste niin tsekataan, että sinulla on oikeus eläkealennukseen...</p>
   <a href="${credentialRequest}"><img src="${dataURL}" alt="Credential Request QR Code" /></a>
   <script>
-   const uri = '${config.verifier_base}/status?id=${states[id]}'
-   async functon checkstatus() {
+   const uri = '/status?id=${id}'
+   let timer
+   async function checkStatus() {
     const resp = await fetch(uri)
     if (resp.status == 200) {
-     const obj = await resp.json()
-     console.log(obj)
+     const status = await resp.json()
+     if (status.verificationResult) {
+      console.log(JSON.stringify(obj, null, 1))
+      const pre = document.createElement('pre')
+      pre.innerHTML = JSON.stringify(status, null, 2)
+      pre.style.textAlign = 'left'
+      document.body.appendChild(pre)
+      clearInterval(timer)
+     }
     }
    }
-   setInterval(checkStatus, 3000)
+   timer = setInterval(checkStatus, 3000)
   </script>
  </body>
 </html>`)
+}
+
+async function showSuccess(id, res) {
+  const status = await getStatus(id)
+  console.log(id, status)
+  res.setHeader("Content-Type", "text/html")
+  res.writeHead(200)
+  res.end(`<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<body style="text-align: center;">
+<h1>Tiedot tulivat perille!</h1>
+<p>Todisteen tarkistuksen tila: <strong>${status.verificationResult}</strong></p>
+<h2>Tiedot:</h2>
+<pre style="text-align: left">${JSON.stringify(status.policyResults?.results[1].policies[0].result.credentialSubject, null, 1)}</pre>
+</body>
+</html>`)
+}
+
+async function getStatus(id) {
+  const statusUrl = `${config.verifier_api}/openid4vc/session/${states[id]}`
+  const resp = await fetch(statusUrl)
+  const verificationStatus = await resp.json()
+  console.log(statusUrl, resp.status)
+  // console.log(statusUrl, resp.status, JSON.stringify(verificationStatus, null, 1))
+  return verificationStatus
+}
+
+const requestCredential = async function (req, res) {
+  const fullUrl = new URL(config.verifier_base + req.url)
+  let id = fullUrl.searchParams.get('id')
+  console.log(fullUrl.pathname, fullUrl.searchParams.get('id'), id)
+  switch (fullUrl.pathname) {
+    case '/error':
+      res.setHeader("Content-Type", "text/plain")
+      res.writeHead(500)
+      res.end(`Virhe käsiteltäessä tapahtumaa ${id}`)
+      return false
+    case '/success':
+      await showSuccess(id, res)
+      return false
+    case '/status':
+      const status = await getStatus(id)
+      res.setHeader("Content-Type", "application/json")
+      res.writeHead(200)
+      res.end(JSON.stringify(status))
+      return false
+  }
+  if (req.url !== '/') {
+    res.setHeader("Content-Type", "text/plain")
+    res.writeHead(404)
+    res.end(`Not Found`)
+    return false
+  }
+  await showRequest(res)
 }
 
 const server = createServer(requestCredential)
