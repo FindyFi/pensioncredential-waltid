@@ -3,6 +3,8 @@ import QRCode from 'qrcode'
 import { v4 as uuidv4 } from 'uuid'
 import { config } from './init.js'
 
+const states = {}
+
 async function createRequest(id) {
   const requestUrl = `${config.verifier_api}/openid4vc/verify`
   const requestBody = {
@@ -26,12 +28,14 @@ async function createRequest(id) {
   // console.log(requestUrl, JSON.stringify(requestParams, null, 1))
   const resp = await fetch(requestUrl, requestParams)
   const credentialRequest = await resp.text()
+  const url = new URL(createRequest)
+  states[id] = url.searchParams.get('state')
   console.log(resp.status, credentialRequest, id)
   return credentialRequest
 }
 
 async function getStatus(id) {
-  const statusUrl = `${config.verifier_api}/openid4vc/session/${id}`
+  const statusUrl = `${config.verifier_api}/openid4vc/session/${states[id]}`
   const resp = await fetch(statusUrl)
   const verificationStatus = await resp.json()
   console.log(statusUrl, resp.status)
