@@ -28,7 +28,7 @@ async function createRequest(id) {
   // console.log(requestUrl, JSON.stringify(requestParams, null, 1))
   const resp = await fetch(requestUrl, requestParams)
   const credentialRequest = await resp.text()
-  const url = new URL(createRequest)
+  const url = new URL(credentialRequest)
   states[id] = url.searchParams.get('state')
   console.log(resp.status, credentialRequest, id)
   return credentialRequest
