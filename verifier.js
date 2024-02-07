@@ -56,9 +56,17 @@ const requestCredential = async function (req, res) {
     case '/success':
       const status = await getStatus(id)
       console.log(id, status)
-      res.setHeader("Content-Type", "application/json")
+      res.setHeader("Content-Type", "text/html")
       res.writeHead(200)
-      res.end(JSON.stringify(status, null, 1))
+      res.end(`<!DOCTYPE html>
+<html>
+ <meta charset="UTF-8">
+ <body style="text-align: center;">
+  <h1>Tiedot tulivat perille!</h1>
+  <p>Todisteen tarkistuksen tila: <strong>${status.verificationResult}</strong></p>
+  <p>Tiedot:</p> <pre>${JSON.stringify(policyResults?.results[1].policies[0].result.credentialSubject, null, 1)}</pre>
+ </body>
+</html>`)
       return false
   }
   if (req.url !== '/') {
@@ -80,6 +88,17 @@ const requestCredential = async function (req, res) {
   <h1>Heippa vahvasti tunnistettu asiakas!</h1>
   <p>Lähetäpä eläketodiste niin tsekataan, että sinulla on oikeus eläkealennukseen...</p>
   <a href="${credentialRequest}"><img src="${dataURL}" alt="Credential Request QR Code" /></a>
+  <script>
+   const uri = ${config.verifier_base}/status?id=${states[id]}
+   async functon checkstatus() {
+    const resp = await fetch(uri)
+    if (resp.status == 200) {
+     const obj = await resp.json()
+     console.log(obj)
+    }
+   }
+   setInterval(checkStatus, 3000)
+  </script>
  </body>
 </html>`)
 }
