@@ -3,8 +3,6 @@ import QRCode from 'qrcode'
 import { v4 as uuidv4 } from 'uuid'
 import { config } from './init.js'
 
-const states = {}
-
 async function createRequest(id) {
   const requestUrl = `${config.verifier_api}/openid4vc/verify`
   const requestBody = {
@@ -29,17 +27,16 @@ async function createRequest(id) {
   const resp = await fetch(requestUrl, requestParams)
   const credentialRequest = await resp.text()
   console.log(resp.status, credentialRequest)
-  const url = new URL(credentialRequest)
-  states[id] = url.searchParams.get('state')
-  console.log(url.search, url.searchParams)
   return credentialRequest
 }
 
 async function getStatus(id) {
-  const statusUrl = `${config.verifier_api}/vp/session/${states[id]}`
+  const statusUrl = `${config.verifier_api}/openid4vc/session/${id}`
   const resp = await fetch(statusUrl)
-  const verificationStatus = await resp.text()
-  console.log(statusUrl, resp.status, verificationStatus)
+  const verificationStatus = await resp.json()
+  console.log(statusUrl, resp.status)
+  // console.log(statusUrl, resp.status, JSON.stringify(verificationStatus, null, 1))
+  return verificationStatus
 }
 
 const requestCredential = async function (req, res) {
@@ -55,9 +52,9 @@ const requestCredential = async function (req, res) {
     case '/success':
       const status = await getStatus(id)
       console.log(id, status)
-      res.setHeader("Content-Type", "text/plain")
+      res.setHeader("Content-Type", "application/json")
       res.writeHead(200)
-      res.end(status)
+      res.end(JSON.stringify(status, null, 1))
       return false
   }
   if (req.url !== '/') {
@@ -68,7 +65,7 @@ const requestCredential = async function (req, res) {
   }
   const credentialRequest = await createRequest(id)
   const dataURL = await QRCode.toDataURL(credentialRequest)
-  
+
   res.setHeader("Content-Type", "text/html")
   res.writeHead(200)
   res.end(`<!DOCTYPE html>
