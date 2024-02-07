@@ -64,7 +64,8 @@ const requestCredential = async function (req, res) {
  <body style="text-align: center;">
   <h1>Tiedot tulivat perille!</h1>
   <p>Todisteen tarkistuksen tila: <strong>${status.verificationResult}</strong></p>
-  <p>Tiedot:</p> <pre>${JSON.stringify(status.policyResults?.results[1].policies[0].result.credentialSubject, null, 1)}</pre>
+  <h2>Tiedot:</h2>
+  <pre style="text-align: left">${JSON.stringify(status.policyResults?.results[1].policies[0].result.credentialSubject, null, 1)}</pre>
  </body>
 </html>`)
       return false
@@ -89,7 +90,7 @@ const requestCredential = async function (req, res) {
   <p>Lähetäpä eläketodiste niin tsekataan, että sinulla on oikeus eläkealennukseen...</p>
   <a href="${credentialRequest}"><img src="${dataURL}" alt="Credential Request QR Code" /></a>
   <script>
-   const uri = ${config.verifier_base}/status?id=${states[id]}
+   const uri = '${config.verifier_base}/status?id=${states[id]}'
    async functon checkstatus() {
     const resp = await fetch(uri)
     if (resp.status == 200) {
