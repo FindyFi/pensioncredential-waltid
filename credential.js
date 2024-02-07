@@ -1,25 +1,30 @@
 import { createHash } from 'node:crypto'
-import { config, roles } from './init.js'
+
+const ns_prefix = "https://pensiondemo.findy.fi/credentials"
+const issuer = {
+  "name": "Kela",
+  "did": "did:key:z6MkqbWvWjTXEVANffRXBNmJv9hFtNeZf9bUJxFkF7tgKN1b"
+}
 
 const hash = createHash('sha256')
-const salt = config.ns_prefix
+const salt = ns_prefix
 
-export const pensionCredential = {
+const credential = {
   "@context": [
     "https://www.w3.org/2018/credentials/v1",
-    `${config.ns_prefix}/pensioncredential-schema/pensioncredential.json`
+    "https://pensiondemo.findy.fi/pensioncredential-schema/pensioncredential-v09.json"
   ],
-  "id": `${config.ns_prefix}/${new Date().getTime()}`,
+  "id": `${ns_prefix}/${new Date().getTime()}`,
   "type": [
     "VerifiableCredential",
-    "PensionCertificate"
+    "PensionCredential"
   ],
   "issuer": {
     "type": ["Profile"],
-    "id": roles['issuer'].did,
-    "name": roles['issuer'].name,
-    "url": roles['issuer'].url,
-    "url": roles['issuer'].image,
+    "id": issuer.did,
+    "name": issuer.name,
+    "url": issuer.url,
+    "url": issuer.image,
   },
   "issuanceDate": new Date().toISOString(),
   "expirationDate": new Date().toISOString(),
@@ -43,3 +48,6 @@ export const pensionCredential = {
     }
   }
 }
+
+console.log(JSON.stringify(credential, null, 2))
+export const pensionCredential = credential
