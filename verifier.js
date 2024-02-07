@@ -64,7 +64,7 @@ const requestCredential = async function (req, res) {
  <body style="text-align: center;">
   <h1>Tiedot tulivat perille!</h1>
   <p>Todisteen tarkistuksen tila: <strong>${status.verificationResult}</strong></p>
-  <p>Tiedot:</p> <pre>${JSON.stringify(policyResults?.results[1].policies[0].result.credentialSubject, null, 1)}</pre>
+  <p>Tiedot:</p> <pre>${JSON.stringify(status.policyResults?.results[1].policies[0].result.credentialSubject, null, 1)}</pre>
  </body>
 </html>`)
       return false
