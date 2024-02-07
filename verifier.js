@@ -26,7 +26,7 @@ async function createRequest(id) {
   // console.log(requestUrl, JSON.stringify(requestParams, null, 1))
   const resp = await fetch(requestUrl, requestParams)
   const credentialRequest = await resp.text()
-  console.log(resp.status, credentialRequest)
+  console.log(resp.status, credentialRequest, id)
   return credentialRequest
 }
 
@@ -42,7 +42,7 @@ async function getStatus(id) {
 const requestCredential = async function (req, res) {
   const fullUrl = new URL(config.verifier_base + req.url)
   let id = fullUrl.searchParams.get('id') || uuidv4()
-  console.log(fullUrl.pathname, id)
+  console.log(fullUrl.pathname, fullUrl.searchParams.get('id'), id)
   switch (fullUrl.pathname) {
     case '/error':
       res.setHeader("Content-Type", "text/plain")
