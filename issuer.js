@@ -1,4 +1,4 @@
-import { createServer, request } from 'node:http'
+import { createServer } from 'node:http'
 import QRCode from 'qrcode'
 import { v4 as uuidv4 } from 'uuid'
 import pensionCredential from './pensioncredential.json' assert {'type': 'json'}
