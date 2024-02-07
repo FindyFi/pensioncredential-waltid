@@ -1,7 +1,6 @@
 {
     "issuer_api": "https://issuer.waltid.findy.fi",
     "verifier_api": "https://verifier.waltid.findy.fi",
-    "ns_prefix": "https://pensiondemo.findy.fi",
     "db_file": "database.sqlite",
     "server_host": "localhost",
     "issuer_port": 6080,
