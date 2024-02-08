@@ -11,7 +11,31 @@ async function createRequest(id) {
   const requestBody = {
     "request_credentials": [
       "PensionCredential"
-    ]
+    ],
+    "presentation_definition": {
+      "id": "<automatically assigned>",
+      "input_descriptors": [
+        {
+          "id": "Kela-HSL",
+          "name": "Eläketodiste",
+          "purpose": "HSL:n eläkealennusoikeuden rekisteröintiin",
+          "constraints": {
+            "fields": [
+              {
+                "path": [
+                  "$.credentialSubject.Person.birthDate",
+                  "$.credentialSubject.Person.givenName",
+                  "$.credentialSubject.Person.familyName",
+                  "$.credentialSubject.Pension.statusCode",
+                  "$.credentialSubject.Pension.typeCode",
+                ],
+              }
+            ],
+            "limit_disclosure": "required"
+          }
+        }
+      ]
+    }
   }
   const requestParams = {
     method: 'POST',
