@@ -89,7 +89,6 @@ async function showRequest(res) {
       c.ondblclick = function(e) {
         this.classList.toggle('full')
       }
-      document.body.appendChild(pre)
       clearInterval(timer)
      }
     }
