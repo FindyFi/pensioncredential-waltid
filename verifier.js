@@ -11,7 +11,8 @@ async function createRequest(id) {
   const requestBody = {
     "request_credentials": [
       "PensionCredential"
-    ],
+    ]
+/*
     "presentation_definition": {
       "id": "<automatically assigned>",
       "input_descriptors": [
@@ -36,6 +37,7 @@ async function createRequest(id) {
         }
       ]
     }
+*/
   }
   const requestParams = {
     method: 'POST',
@@ -52,6 +54,9 @@ async function createRequest(id) {
   // console.log(JSON.stringify(requestBody, null, 1))
   // console.log(requestUrl, JSON.stringify(requestParams, null, 1))
   const resp = await fetch(requestUrl, requestParams)
+  if (resp.status != 200) {
+    console.log(resp.status, requestUrl, JSON.stringify(requestParams, null, 1))
+  }
   const credentialRequest = await resp.text()
   const url = new URL(credentialRequest)
   states[id] = url.searchParams.get('state')
@@ -170,14 +175,17 @@ async function getStatus(id) {
   const resp = await fetch(statusUrl)
   const verificationStatus = await resp.json()
   console.log(statusUrl, resp.status)
+  if (resp.status != 200) {
+    console.log(JSON.stringify(verificationStatus, null, 1))
+  }
   // console.log(statusUrl, resp.status, JSON.stringify(verificationStatus, null, 1))
   return verificationStatus
 }
 
-const requestCredential = async function (req, res) {
+const handleRequests = async function (req, res) {
   const fullUrl = new URL(config.verifier_base + req.url)
   let id = fullUrl.searchParams.get('id')
-  console.log(fullUrl.pathname, fullUrl.searchParams.get('id'), id)
+  console.log(fullUrl.pathname, id)
   switch (fullUrl.pathname) {
     case '/error':
       res.setHeader("Content-Type", "text/plain")
@@ -203,7 +211,7 @@ const requestCredential = async function (req, res) {
   await showRequest(res)
 }
 
-const server = createServer(requestCredential)
+const server = createServer(handleRequests)
 server.listen(config.verifier_port, config.server_host, () => {
     console.log(`Server is running on http://${config.server_host}:${config.verifier_port}`)
 })
