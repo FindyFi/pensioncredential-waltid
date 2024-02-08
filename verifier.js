@@ -45,7 +45,15 @@ async function showRequest(res) {
 <html>
  <meta charset="UTF-8">
  <style>
+  table {
+    max-width: 30em;
+  }
+  th, td {
+    text-align: left;
+  }
   pre {
+    background-color: black;
+    color: green;
     display: none;
     text-align: left;
   }
@@ -71,7 +79,8 @@ async function showRequest(res) {
      if (status.verificationResult) {
       console.log(JSON.stringify(status, null, 1))
       const credential = status.policyResults?.results?.at(1)?.policies?.at(0)?.result?.credentialSubject
-      const html = \`<table>
+      const html = \`<p>Todisteen tarkistuksen tila: <strong>\${status.verificationResult}</strong></p>
+      <table>
       <tr><th>Nimi</th><td>\${credential.Person?.givenName} \${credential.Person?.familyName}</td></tr>
       <tr><th>Eläke</th><td>\${credential.Pension?.typeName} \${credential.Pension?.typeCode} \${credential.Pension?.statusCode || ''}</td></tr>
       </table>
@@ -114,12 +123,20 @@ async function showSuccess(id, res) {
   res.writeHead(200)
   res.end(`<!DOCTYPE html>
 <html>
-<meta charset="UTF-8">
-<body style="text-align: center;">
-<h1>Tiedot tulivat perille!</h1>
-<p>Todisteen tarkistuksen tila: <strong>${status.verificationResult}</strong></p>
+ <meta charset="UTF-8">
+ <style>
+  table {
+   max-width: 30em;
+  }
+  pre, th, td {
+   text-align: left;
+  }
+ </style>
+ <body style="text-align: center;">
+  <h1>Tiedot tulivat perille!</h1>
+  <p>Todisteen tarkistuksen tila: <strong>${status.verificationResult}</strong></p>
 ${html}
-</body>
+ </body>
 </html>`)
 }
 
