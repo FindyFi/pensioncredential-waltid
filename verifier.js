@@ -47,6 +47,7 @@ async function showRequest(res) {
  <style>
   table {
     max-width: 30em;
+    margin: 1em auto;
   }
   th, td {
     text-align: left;
@@ -126,6 +127,7 @@ async function showSuccess(id, res) {
  <style>
   table {
    max-width: 30em;
+   margin: 1em auto;
   }
   pre, th, td {
    text-align: left;
