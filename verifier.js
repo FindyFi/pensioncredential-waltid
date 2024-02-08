@@ -77,6 +77,7 @@ async function showRequest(res) {
     if (resp.status == 200) {
      const status = await resp.json()
      if (status.verificationResult) {
+      clearInterval(timer)
       console.log(JSON.stringify(status, null, 1))
       const credential = status.policyResults?.results?.at(1)?.policies?.at(0)?.result?.credentialSubject
       const html = \`<p>Todisteen tarkistuksen tila: <strong>\${status.verificationResult}</strong></p>
@@ -89,7 +90,6 @@ async function showRequest(res) {
       c.ondblclick = function(e) {
         this.classList.toggle('full')
       }
-      clearInterval(timer)
      }
     }
    }
