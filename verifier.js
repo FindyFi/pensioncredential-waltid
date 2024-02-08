@@ -11,33 +11,54 @@ async function createRequest(id) {
   const requestBody = {
     "request_credentials": [
       "PensionCredential"
-    ]
-/*
+    ],
     "presentation_definition": {
       "id": "<automatically assigned>",
+      "name": "Eläketodiste",
+      "purpose": "HSL:n eläkealennusoikeuden rekisteröintiin",
       "input_descriptors": [
         {
           "id": "Kela-HSL",
-          "name": "Eläketodiste",
-          "purpose": "HSL:n eläkealennusoikeuden rekisteröintiin",
           "constraints": {
             "fields": [
               {
                 "path": [
-                  "$.credentialSubject.Person.birthDate",
                   "$.credentialSubject.Person.givenName",
+                ]
+              },
+              {
+                "path": [
                   "$.credentialSubject.Person.familyName",
+                ]
+              },
+              {
+                "path": [
+                  "$.credentialSubject.Person.birthDate",
+                ]
+              },
+              {
+                "path": [
                   "$.credentialSubject.Pension.statusCode",
+                ]
+              },
+/*
+              {
+                "path": [
                   "$.credentialSubject.Pension.typeCode",
-                ],
-              }
+                ]
+              },
+              {
+                "path": [
+                  "$.credentialSubject.Pension.typeName",
+                ]
+              },
+*/
             ],
             "limit_disclosure": "required"
           }
         }
       ]
     }
-*/
   }
   const requestParams = {
     method: 'POST',
@@ -171,6 +192,9 @@ ${html}
 }
 
 async function getStatus(id) {
+  if (!states[id]) {
+    return false
+  }
   const statusUrl = `${config.verifier_api}/openid4vc/session/${states[id]}`
   const resp = await fetch(statusUrl)
   const verificationStatus = await resp.json()
