@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { config } from './init.js'
 
 const states = {}
+const pollingInterval = 3 // seconds
 
 async function createRequest(id) {
   const requestUrl = `${config.verifier_api}/openid4vc/verify`
@@ -43,12 +44,24 @@ async function showRequest(res) {
   res.end(`<!DOCTYPE html>
 <html>
  <meta charset="UTF-8">
+ <style>
+  pre {
+    display: none;
+    text-align: left;
+  }
+  #content.full pre {
+    display: block;
+  }
+ </style>
  <body style="text-align: center;">
   <img src="https://cdn-assets-cloud.frontify.com/s3/frontify-cloud-files-us/eyJwYXRoIjoiZnJvbnRpZnlcL2FjY291bnRzXC8yZFwvMTkyOTA4XC9wcm9qZWN0c1wvMjQ5NjY1XC9hc3NldHNcLzAwXC80NTY4NzI2XC81MjA2ODk2MDdmZGRkYjBlMDEwMDhiOTVlMTk1OTRjMS0xNTk1NDI3ODE5LnN2ZyJ9:frontify:ToCDM7NDPWebZDLJcmAgDwA_EsA9XJBl3YroZI1XhA0?width=240" alt="HSL" />
   <h1>Heippa vahvasti tunnistettu asiakas!</h1>
-  <p>Lähetäpä eläketodiste niin tsekataan, että sinulla on oikeus eläkealennukseen...</p>
-  <a href="${credentialRequest}"><img src="${dataURL}" alt="Credential Request QR Code" /></a>
+  <div id="content">
+   <p>Lähetäpä eläketodiste niin tsekataan, että sinulla on oikeus eläkealennukseen...</p>
+   <a href="${credentialRequest}"><img src="${dataURL}" alt="Credential Request QR Code" /></a>
+  </div>
   <script>
+   const c = document.querySelector('#content')
    const uri = '/status?id=${id}'
    let timer
    async function checkStatus() {
@@ -57,22 +70,45 @@ async function showRequest(res) {
      const status = await resp.json()
      if (status.verificationResult) {
       console.log(JSON.stringify(status, null, 1))
-      const pre = document.createElement('pre')
-      pre.innerHTML = JSON.stringify(status, null, 2)
-      pre.style.textAlign = 'left'
+      const credential = status.policyResults?.results?.at(1)?.policies?.at(0)?.result?.credentialSubject
+      const html = \`<table>
+      <tr><th>Nimi</th><td>\${credential.Person?.givenName} \${credential.Person?.familyName}</td></tr>
+      <tr><th>Eläke</th><td>\${credential.Pension?.typeName} \${credential.Pension?.typeCode} \${credential.Pension?.statusCode || ''}</td></tr>
+      </table>
+      <pre>\${JSON.stringify(status, null, 2)}</pre>\`
+      c.innerHTML = html
+      c.ondblclick = function(e) {
+        this.classList.toggle('full')
+      }
       document.body.appendChild(pre)
       clearInterval(timer)
      }
     }
    }
-   timer = setInterval(checkStatus, 3000)
+   timer = setInterval(checkStatus, ${pollingInterval * 1000} )
   </script>
  </body>
 </html>`)
 }
 
+function renderCredential(credential) {
+  const html = `<table>
+  <tr><th>Nimi</th><td>${credential.Person?.givenName} ${credential.Person?.familyName}</td></tr>
+  <tr><th>Eläke</th><td>${credential.Pension?.typeName} ${credential.Pension?.typeCode} ${credential.Pension?.statusCode || ''}</td></tr>
+  </table>`
+  return html
+}
+
 async function showSuccess(id, res) {
   const status = await getStatus(id)
+  const credential = status.policyResults?.results?.at(1)?.policies?.at(0)?.result?.credentialSubject
+  let html
+  if (credential) {
+    html = `<h2>Tiedot:</h2>\n${renderCredential(credential)}`
+  }
+  else {
+    html = `<h2>VIRHE:</h2>\n<pre>${JSON.stringify(status, null, 1)}</pre>`
+  }
   console.log(id, status)
   res.setHeader("Content-Type", "text/html")
   res.writeHead(200)
@@ -82,8 +118,7 @@ async function showSuccess(id, res) {
 <body style="text-align: center;">
 <h1>Tiedot tulivat perille!</h1>
 <p>Todisteen tarkistuksen tila: <strong>${status.verificationResult}</strong></p>
-<h2>Tiedot:</h2>
-<pre style="text-align: left">${JSON.stringify(status.policyResults?.results[1].policies[0].result.credentialSubject, null, 1)}</pre>
+${html}
 </body>
 </html>`)
 }
