@@ -40,14 +40,35 @@ async function getOffer() {
     },
     "selectiveDisclosure": {
       "fields": {
-        "Person.birthDate": {
-          "sd": true
-        },
-        "Person.familyName": {
-          "sd": true
-        },
-        "Person.givenName": {
-          "sd": true
+        "credentialSubject": {
+          "sd": false,
+          "children": {
+            "fields": {
+              "Pension": {
+                "sd": false,
+                "children": {
+                  "fields": {
+                    "typeCode": { "sd": false },
+                    "typeName": { "sd": true },
+                    "statusCode": { "sd": false },
+                  }
+                }
+              },
+              "Person": {
+                "sd": true,
+                "children": {
+                  "fields": {
+                    "birthDate": { "sd": false },
+                    "familyName": { "sd": false },
+                    "givenName": { "sd": false },
+                  }
+                }
+              },
+              "IdentityObject": {
+                "sd": true,
+              }
+            }
+          }
         }
       }
     }
