@@ -16,48 +16,6 @@ async function createRequest(id) {
       "id": "<automatically assigned>",
       "name": "Eläketodiste",
       "purpose": "HSL:n eläkealennusoikeuden rekisteröintiin",
-      "input_descriptors": [
-        {
-          "id": "Kela-HSL",
-          "constraints": {
-            "fields": [
-              {
-                "path": [
-                  "$.credentialSubject.Person.givenName",
-                ]
-              },
-              {
-                "path": [
-                  "$.credentialSubject.Person.familyName",
-                ]
-              },
-              {
-                "path": [
-                  "$.credentialSubject.Person.birthDate",
-                ]
-              },
-              {
-                "path": [
-                  "$.credentialSubject.Pension.statusCode",
-                ]
-              },
-/*
-              {
-                "path": [
-                  "$.credentialSubject.Pension.typeCode",
-                ]
-              },
-              {
-                "path": [
-                  "$.credentialSubject.Pension.typeName",
-                ]
-              },
-*/
-            ],
-            "limit_disclosure": "required"
-          }
-        }
-      ]
     }
   }
   const requestParams = {
