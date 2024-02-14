@@ -16,6 +16,7 @@ async function createRequest(id) {
       "id": "<automatically assigned>",
       "name": "Eläketodiste",
       "purpose": "HSL:n eläkealennusoikeuden rekisteröintiin",
+      "input_descriptors": []
     }
   }
   const requestParams = {
