@@ -16,7 +16,33 @@ async function createRequest(id) {
       "id": "<automatically assigned>",
       "name": "Eläketodiste",
       "purpose": "HSL:n eläkealennusoikeuden rekisteröintiin",
-      "input_descriptors": []
+      "input_descriptors": [{
+        "id": "Kela-HSL",
+        "constraints": {
+          "fields": [
+            {
+              "path": [
+                "$.credentialSubject.Person.givenName",
+              ]
+            },
+            {
+              "path": [
+                "$.credentialSubject.Person.familyName",
+              ]
+            },
+            {
+              "path": [
+                "$.credentialSubject.Person.birthDate",
+              ]
+            },
+            {
+              "path": [
+                "$.credentialSubject.Pension.statusCode",
+              ]
+            },
+          ],
+        }
+      }]
     }
   }
   const requestParams = {
@@ -161,7 +187,7 @@ async function getStatus(id) {
   if (resp.status != 200) {
     console.log(JSON.stringify(verificationStatus, null, 1))
   }
-  // console.log(statusUrl, resp.status, JSON.stringify(verificationStatus, null, 1))
+  console.log(statusUrl, resp.status, JSON.stringify(verificationStatus, null, 1))
   return verificationStatus
 }
 
