@@ -1,9 +1,7 @@
 {
   "type": "module",
   "dependencies": {
-    "express": "latest",
     "qrcode": "latest",
-    "sqlite3": "latest",
-    "uuid": "^9.0.1"
+    "sqlite3": "latest"
   }
 }
