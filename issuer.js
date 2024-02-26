@@ -53,8 +53,10 @@ async function getOffer() {
   // console.log(issueUrl, JSON.stringify(credParams, null, 1))
   const resp = await fetch(issueUrl, credParams)
   const credentialOffer = await resp.text()
-  console.log(resp.status, credentialOffer)
-  return credentialOffer
+  // console.log(resp.status, credentialOffer)
+  const params = new URL(credentialOffer).searchParams
+  const json = params.get('credential_offer')
+  return json
 }
 
 const sendOffer = async function (req, res) {
@@ -62,7 +64,7 @@ const sendOffer = async function (req, res) {
     const credentialOffer = await getOffer()
     res.setHeader("Content-Type", "application/json")
     res.writeHead(200)
-    res.send(JSON.stringify(credentialOffer))
+    res.end(credentialOffer)
     return false
   }
   else if (req.url !== '/') {
