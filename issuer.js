@@ -88,24 +88,40 @@ const sendOffer = async function (req, res) {
   <img src="https://upload.wikimedia.org/wikipedia/en/thumb/6/67/Kela_suomi_kela-1-.jpg/220px-Kela_suomi_kela-1-.jpg" alt="Kela" />
   <h1>Heippa vahvasti tunnistettu asiakas!</h1>
   <p>Skannaapa oheinen QR-koodi digikukkarollasi niin laitetaan sinne eläketodistetta tulemaan...</p>
-  <canvas id="qrcode">
+  <canvas id="qrcode"></canvas>
+  <p id="offer">Valmistellaan...</p>
   <script>
-  let qrUrl = '${await getOffer()}'
-  const canvas = document.getElementById("qrcode");
-  const qr = QRCode.QRCodeBrowser(canvas);
-  const url = new URL(document.location)
-  if (url.searchParams.get('credential_offer_uri')) {
-    url.pathname = '${credentialOfferPath}'
-    url.search = ''
-    qrUrl = 'openid-credential-offer://?credential_offer_uri=' + encodeURIComponent(url)
-  }
-  console.log(qrUrl)
-  qr.setOptions({
-    text: qrUrl,
-    size: 512,
-  })
-  qr.draw()
-  document.querySelector('#qrcode').onclick = () => {document.location.href = qrUrl}
+   let qrUrl = '${await getOffer()}'
+   const canvas = document.getElementById("qrcode");
+   const qr = QRCode.QRCodeBrowser(canvas);
+   const url = new URL(document.location)
+   if (url.searchParams.get('credential_offer_uri')) {
+     url.pathname = '${credentialOfferPath}'
+     url.search = ''
+     qrUrl = 'openid-credential-offer://?credential_offer_uri=' + encodeURIComponent(url)
+   }
+   // console.log(qrUrl)
+   qr.setOptions({
+     text: qrUrl,
+     size: 512,
+   })
+   qr.draw()
+   const a = document.createElement('a')
+   a.textContent = 'Kopioi todistetarjous leikepöydälle.'
+   a.href = qrUrl
+   a.onclick = function(e) {
+    e.preventDefault()
+    try {
+     navigator.clipboard.writeText(this.href);
+    } catch (error) {
+     console.error(error.message);
+    }
+   }
+   // document.querySelector('#qrcode').onclick = () => {document.location.href = qrUrl}
+   const o = document.querySelector('#offer')
+   o.textContent = ''
+   o.appendChild(a)
+   console.log(a)
   </script>
   </body>
 </html>`)
