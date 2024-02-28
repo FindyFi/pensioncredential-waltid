@@ -106,6 +106,22 @@ async function showRequest(res) {
   </div>
   <script>
    const c = document.querySelector('#content')
+
+   const a = document.createElement('a')
+   a.textContent = 'Kopioi todistepyyntö leikepöydälle.'
+   a.href = '${credentialRequest}'
+   a.onclick = function(e) {
+    e.preventDefault()
+    try {
+     navigator.clipboard.writeText(this.href)
+    } catch (error) {
+     console.error(error.message)
+    }
+   }
+   // document.querySelector('#qrcode').onnoclick = () => {document.location.href = qrUrl}
+   const o = document.querySelector('#offer')
+   c.appendChild(a)
+
    const uri = '/status?id=${id}'
    let timer
    async function checkStatus() {
