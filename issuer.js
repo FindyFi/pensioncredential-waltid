@@ -2,8 +2,6 @@ import { createServer } from 'node:http'
 import pensionCredential from './pensioncredential.json' assert {'type': 'json'}
 import { config, roles } from './init.js'
 
-const credentialOfferPath = '/credentialOffer'
-
 // console.log(roles)
 // console.log(JSON.stringify(pensionCredential, null, 2))
 
@@ -57,16 +55,7 @@ async function getOffer() {
 
 const sendOffer = async function (req, res) {
   const path = new URL(`http://${config.server_host}${req.url}`).pathname
-  if (path == credentialOfferPath) {
-    const credentialOffer = await getOffer()
-    const params = new URL(credentialOffer).searchParams
-    const json = params.get('credential_offer')
-    res.setHeader("Content-Type", "application/json")
-    res.writeHead(200)
-    res.end(json)
-    return false
-  }
-  else if (path !== '/') {
+  if (path !== '/') {
     res.setHeader("Content-Type", "text/plain")
     res.writeHead(404)
     res.end(`Not Found`)
@@ -94,16 +83,9 @@ const sendOffer = async function (req, res) {
    let qrUrl = '${await getOffer()}'
    const canvas = document.getElementById("qrcode");
    const qr = QRCode.QRCodeBrowser(canvas);
-   const url = new URL(document.location)
-   if (url.searchParams.get('credential_offer_uri')) {
-     url.pathname = '${credentialOfferPath}'
-     url.search = ''
-     qrUrl = 'openid-credential-offer://?credential_offer_uri=' + encodeURIComponent(url)
-   }
-   // console.log(qrUrl)
    qr.setOptions({
      text: qrUrl,
-     size: 512,
+     size: 256,
    })
    qr.draw()
    const a = document.createElement('a')
@@ -112,16 +94,15 @@ const sendOffer = async function (req, res) {
    a.onclick = function(e) {
     e.preventDefault()
     try {
-     navigator.clipboard.writeText(this.href);
+     navigator.clipboard.writeText(this.href)
     } catch (error) {
-     console.error(error.message);
+     console.error(error.message)
     }
    }
-   // document.querySelector('#qrcode').onclick = () => {document.location.href = qrUrl}
+   // document.querySelector('#qrcode').onnoclick = () => {document.location.href = qrUrl}
    const o = document.querySelector('#offer')
    o.textContent = ''
    o.appendChild(a)
-   console.log(a)
   </script>
   </body>
 </html>`)
