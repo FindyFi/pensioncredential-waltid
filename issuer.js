@@ -43,17 +43,19 @@ async function getOffer() {
           "children": {
             "fields": {
               "Pension": {
-                "sd": true,
+                "sd": false,
                 "children": {
                   "fields": {
+                    "endDate": { "sd": true },
+                    "startDate": { "sd": true },
+                    "statusCode": { "sd": true },
                     "typeCode": { "sd": true },
                     "typeName": { "sd": true },
-                    "statusCode": { "sd": true },
                   }
                 }
               },
               "Person": {
-                "sd": true,
+                "sd": false,
                 "children": {
                   "fields": {
                     "birthDate": { "sd": true },
