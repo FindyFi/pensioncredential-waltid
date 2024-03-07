@@ -37,6 +37,11 @@ async function createRequest(id) {
             },
             {
               "path": [
+                "$.credentialSubject.Pension.typeCode",
+              ]
+            },
+            {
+              "path": [
                 "$.credentialSubject.Pension.statusCode",
               ]
             },
@@ -138,8 +143,8 @@ async function showRequest(res) {
       const credential = credentialPolicies?.at(0)?.result?.credentialSubject
       const html = \`<p>Todisteen tarkistuksen tila: <strong>\${status.verificationResult}</strong></p>
       <table>
-      <tr><th>Nimi</th><td>\${credential.Person?.givenName} \${credential.Person?.familyName}</td></tr>
-      <tr><th>Eläke</th><td>\${credential.Pension?.typeName} \${credential.Pension?.typeCode} \${credential.Pension?.statusCode || ''}</td></tr>
+      <tr><th>Nimi</th><td>\${credential.Person?.givenName} \${credential.Person?.familyName} \${credential.Person?.birthDate}</td></tr>
+      <tr><th>Eläke</th><td>\${credential.Pension?.typeCode} \${credential.Pension?.statusCode || ''}</td></tr>
       </table>
       <pre>\${JSON.stringify(status, null, 2)}</pre>\`
       c.innerHTML = html
@@ -149,7 +154,10 @@ async function showRequest(res) {
       const t = document.createElement('table')
       let trs = \`<tr><th>Tarkastus</th><th>Tulos</th></tr>\`
       for (const policy of presentationPolicies) {
-       trs += \`<tr><th>\${policy.description}</th><th>\${policy.is_success}</th></tr>\`
+       trs += \`<tr><td>\${policy.description}</td><td><strong>\${policy.is_success}</strong></td></tr>\`
+      }
+      for (const policy of credentialPolicies) {
+       trs += \`<tr><td>\${policy.description}</td><td><strong>\${policy.is_success}</strong></td></tr>\`
       }
       t.innerHTML = trs
       c.appendChild(t)
