@@ -36,6 +36,40 @@ async function getOffer() {
       "issuanceDate": "<timestamp>",
       "expirationDate": "<timestamp-in:31d>"
     },
+    "selectiveDisclosure": {
+      "fields": {
+        "credentialSubject": {
+          "sd": false,
+          "children": {
+            "fields": {
+              "Pension": {
+                "sd": true,
+                "children": {
+                  "fields": {
+                    "typeCode": { "sd": true },
+                    "typeName": { "sd": true },
+                    "statusCode": { "sd": true },
+                  }
+                }
+              },
+              "Person": {
+                "sd": true,
+                "children": {
+                  "fields": {
+                    "birthDate": { "sd": true },
+                    "familyName": { "sd": true },
+                    "givenName": { "sd": true },
+                  }
+                }
+              },
+              "IdentityObject": {
+                "sd": true,
+              }
+            }
+          }
+        }
+      }
+    }
   }
   const credParams = {
     method: 'POST',
