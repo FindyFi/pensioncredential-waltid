@@ -37,11 +37,6 @@ async function createRequest(id) {
             },
             {
               "path": [
-                "$.credentialSubject.Pension.typeCode",
-              ]
-            },
-            {
-              "path": [
                 "$.credentialSubject.Pension.statusCode",
               ]
             },
