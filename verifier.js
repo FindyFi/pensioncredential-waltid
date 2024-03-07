@@ -110,6 +110,7 @@ async function showRequest(res) {
    const a = document.createElement('a')
    a.textContent = 'Kopioi todistepyyntö leikepöydälle.'
    a.href = '${credentialRequest}'
+   a.style.display = 'block'
    a.onclick = function(e) {
     e.preventDefault()
     try {
@@ -130,8 +131,10 @@ async function showRequest(res) {
      const status = await resp.json()
      if (status.verificationResult) {
       clearInterval(timer)
-      console.log(JSON.stringify(status, null, 1))
-      const credential = status.policyResults?.results?.at(1)?.policies?.at(0)?.result?.credentialSubject
+      // console.log(JSON.stringify(status, null, 1))
+      const presentationPolicies = status.policyResults?.results?.at(0)?.policies
+      const credentialPolicies = status.policyResults?.results?.at(1)?.policies
+      const credential = credentialPolicies?.at(0)?.result?.credentialSubject
       const html = \`<p>Todisteen tarkistuksen tila: <strong>\${status.verificationResult}</strong></p>
       <table>
       <tr><th>Nimi</th><td>\${credential.Person?.givenName} \${credential.Person?.familyName}</td></tr>
@@ -140,8 +143,15 @@ async function showRequest(res) {
       <pre>\${JSON.stringify(status, null, 2)}</pre>\`
       c.innerHTML = html
       c.ondblclick = function(e) {
-        this.classList.toggle('full')
+       this.classList.toggle('full')
       }
+      const t = document.createElement('table')
+      const trs = \`<tr><th>Tarkastus</th><th>Tulos</th></tr>\`
+      for (const policy of presentationPolicies) {
+       trs += \`<tr><th>\${policy.description}</th><th>\${policy.is_success}</th></tr>\`
+      }
+      t.innerHTML = trs
+      c.appendChild(t)
      }
     }
    }
@@ -203,7 +213,7 @@ async function getStatus(id) {
   if (resp.status != 200) {
     console.log(JSON.stringify(verificationStatus, null, 1))
   }
-  console.log(statusUrl, resp.status, JSON.stringify(verificationStatus, null, 1))
+  // console.log(statusUrl, resp.status, JSON.stringify(verificationStatus, null, 1))
   return verificationStatus
 }
 
