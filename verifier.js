@@ -41,6 +41,7 @@ async function createRequest(id) {
               ]
             },
           ],
+          "limit_disclosure": "required"
         }
       }]
     }
@@ -146,7 +147,7 @@ async function showRequest(res) {
        this.classList.toggle('full')
       }
       const t = document.createElement('table')
-      const trs = \`<tr><th>Tarkastus</th><th>Tulos</th></tr>\`
+      let trs = \`<tr><th>Tarkastus</th><th>Tulos</th></tr>\`
       for (const policy of presentationPolicies) {
        trs += \`<tr><th>\${policy.description}</th><th>\${policy.is_success}</th></tr>\`
       }
