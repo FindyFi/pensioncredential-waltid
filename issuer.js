@@ -153,6 +153,8 @@ const sendOffer = async function (req, res) {
     a.href = qrUrl
     a.onclick = function(e) {
      e.preventDefault()
+     console.log(qrUrl)
+     console.log(this.href)
      try {
       navigator.clipboard.writeText(this.href)
      } catch (error) {
