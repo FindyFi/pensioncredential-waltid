@@ -118,11 +118,11 @@ const sendOffer = async function (req, res) {
   <p id="instructions">Tunnistaudu palveluun valitsemalla henkilöllisyytesi valintalistasta:</p>
   <form id="idSelector">
    <select name="identity">
-   <option value="pensioncredential.json">Totti Aalto</option>
-   <option value="pensioncredential-provisional.json">Matti Meikäläinen</option>
-   <option value="pensioncredential-disability.json">Joni Kai Hiltunen</option>
-   <option value="pensioncredential-rehabilitation.json">Jonne Aapeli Setälä</option>
-   <option value="pensioncredential-rehabilitation-expired.json">Annina von Forsellestes</option>
+    <option value="pensioncredential.json">Totti Aalto (KAEL)</option>
+    <option value="pensioncredential-provisional.json">Edwin Kelimtes (väliaikainen TKEL)</option>
+    <option value="pensioncredential-disability.json">Joni Kai Hiltunen (TKEL)</option>
+    <option value="pensioncredential-rehabilitation.json">Jonne Aapeli Setälä (KUKI)</option>
+    <option value="pensioncredential-rehabilitation-expired.json">Annina von Forsellestes (päättynyt KUKI)</option>
    </select>
    <input type="submit" value="Vahvista" />
   </form>
