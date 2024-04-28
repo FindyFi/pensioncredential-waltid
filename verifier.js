@@ -173,8 +173,9 @@ function renderCredential(credential) {
   return html
 }
 
-async function showSuccess(id, res) {
+ async function showSuccess(id, res) {
   const status = await getStatus(id)
+  console.log(JSON.stringify(status, null, 2))
   const credential = status.policyResults?.results?.at(1)?.policies?.at(0)?.result?.credentialSubject
   let html
   if (credential) {
@@ -212,12 +213,13 @@ async function getStatus(id) {
   }
   const statusUrl = `${config.verifier_api}/openid4vc/session/${states[id]}`
   const resp = await fetch(statusUrl)
-  const verificationStatus = await resp.json()
   console.log(statusUrl, resp.status)
   if (resp.status != 200) {
-    console.log(JSON.stringify(verificationStatus, null, 1))
+    console.error(JSON.stringify(await resp.text(), null, 1))
+    return false
   }
-  // console.log(statusUrl, resp.status, JSON.stringify(verificationStatus, null, 1))
+  const verificationStatus = await resp.json()
+  console.log(statusUrl, resp.status, JSON.stringify(verificationStatus, null, 1))
   return verificationStatus
 }
 
@@ -236,6 +238,11 @@ const handleRequests = async function (req, res) {
       return false
     case '/status':
       const status = await getStatus(id)
+      if (!status) {
+        res.setHeader("Content-Type", "text/plain")
+        res.writeHead(500)
+        res.end(`Virhe käsiteltäessä tapahtumaa ${id}`)
+      }
       res.setHeader("Content-Type", "application/json")
       res.writeHead(200)
       res.end(JSON.stringify(status))
