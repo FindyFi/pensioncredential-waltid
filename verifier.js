@@ -134,12 +134,25 @@ async function showRequest(res) {
       clearInterval(timer)
       // console.log(JSON.stringify(status, null, 1))
       const presentationPolicies = status.policyResults?.results?.at(0)?.policies
+      const sdjwt = presentationPolicies?.at(0)?.result?.vp?.verifiableCredential?.at(0)
+      // console.log(sdjwt)
+      const disclosures = sdjwt.split('~')
+      disclosures.splice(0, 1) // discard jwt
+      // console.log(disclosures)
+      const attributes = {}
+      for (const d of disclosures) {
+        const decoded = JSON.parse(atob(d))
+        // console.log(decoded[1], decoded[2])
+        attributes[decoded[1]] = decoded[2]
+      }
+      // console.log(attributes)
       const credentialPolicies = status.policyResults?.results?.at(1)?.policies
       const credential = credentialPolicies?.at(0)?.result?.credentialSubject
       const html = \`<p>Todisteen tarkistuksen tila: <strong>\${status.verificationResult}</strong></p>
       <table>
-      <tr><th>Nimi</th><td>\${credential.Person?.givenName} \${credential.Person?.familyName} \${credential.Person?.birthDate}</td></tr>
-      <tr><th>Eläke</th><td>\${credential.Pension?.typeCode} \${credential.Pension?.statusCode || ''}</td></tr>
+      <tr><th>Hetu</th><td>\${attributes?.person_identifier_code}</td></tr>
+      <tr><th>Eläke</th><td>\${attributes?.Pension?.typeCode}</td></tr>
+      <tr><th>Alkamispäivä</th><td>\${attributes?.Pension?.startDate}</td></tr>
       </table>
       <pre>\${JSON.stringify(status, null, 2)}</pre>\`
       c.innerHTML = html
@@ -149,10 +162,10 @@ async function showRequest(res) {
       const t = document.createElement('table')
       let trs = \`<tr><th>Tarkastus</th><th>Tulos</th></tr>\`
       for (const policy of presentationPolicies) {
-       trs += \`<tr><td>\${policy.description}</td><td><strong>\${policy.is_success}</strong></td></tr>\`
+       trs += \`<tr><td>Verifiable Presentation: \${policy.description}</td><td><strong>\${policy.is_success}</strong></td></tr>\`
       }
       for (const policy of credentialPolicies) {
-       trs += \`<tr><td>\${policy.description}</td><td><strong>\${policy.is_success}</strong></td></tr>\`
+       trs += \`<tr><td>Verifiable Credentials: \${policy.description}</td><td><strong>\${policy.is_success}</strong></td></tr>\`
       }
       t.innerHTML = trs
       c.appendChild(t)
@@ -165,21 +178,30 @@ async function showRequest(res) {
 </html>`)
 }
 
-function renderCredential(credential) {
+function renderCredential(sdjwt) {
+  console.log(sdjwt)
+  const disclosures = sdjwt.split('~')
+  disclosures.splice(0, 1) // discard jwt
+  const attributes = {}
+  for (const d of disclosures) {
+    const decoded = JSON.parse(atob(d))
+    attributes[decoded[1]] = decoded[2]
+  }
   const html = `<table>
-  <tr><th>Nimi</th><td>${credential.Person?.givenName} ${credential.Person?.familyName}</td></tr>
-  <tr><th>Eläke</th><td>${credential.Pension?.typeName} ${credential.Pension?.typeCode} ${credential.Pension?.statusCode || ''}</td></tr>
-  </table>`
+    <tr><th>Hetu</th><td>${attributes?.person_identifier_code}</td></tr>
+    <tr><th>Eläke</th><td>${attributes?.Pension?.typeCode}</td></tr>
+    <tr><th>Alkamispäivä</th><td>${attributes?.Pension?.startDate}</td></tr>
+    </table>`
   return html
 }
 
- async function showSuccess(id, res) {
+async function showSuccess(id, res) {
   const status = await getStatus(id)
   console.log(JSON.stringify(status, null, 2))
-  const credential = status.policyResults?.results?.at(1)?.policies?.at(0)?.result?.credentialSubject
+  const sdjwt = status.policyResults?.results?.at(0)?.policies?.at(0)?.result?.verifiableCredential
   let html
-  if (credential) {
-    html = `<h2>Tiedot:</h2>\n${renderCredential(credential)}`
+  if (sdjwt) {
+    html = `<h2>Tiedot:</h2>\n${renderCredential(sdjwt)}`
   }
   else {
     html = `<h2>VIRHE:</h2>\n<pre>${JSON.stringify(status, null, 1)}</pre>`
@@ -213,13 +235,13 @@ async function getStatus(id) {
   }
   const statusUrl = `${config.verifier_api}/openid4vc/session/${states[id]}`
   const resp = await fetch(statusUrl)
-  console.log(statusUrl, resp.status)
+  // console.log(statusUrl, resp.status)
   if (resp.status != 200) {
     console.error(JSON.stringify(await resp.text(), null, 1))
     return false
   }
   const verificationStatus = await resp.json()
-  console.log(statusUrl, resp.status, JSON.stringify(verificationStatus, null, 1))
+  // console.log(statusUrl, resp.status, JSON.stringify(verificationStatus, null, 1))
   return verificationStatus
 }
 
