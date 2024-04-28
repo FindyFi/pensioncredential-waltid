@@ -2,6 +2,7 @@
   "type": "module",
   "dependencies": {
     "qrcode": "latest",
-    "sqlite3": "latest"
+    "sqlite3": "latest",
+    "uuid": "^9.0.1"
   }
 }
