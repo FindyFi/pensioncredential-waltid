@@ -1,12 +1,11 @@
 import { createServer } from 'node:http'
-import { config, roles } from './init.js'
+import { config, roles, apiHeaders } from './init.js'
 
 // console.log(roles)
 
 async function getHolderDid() {
-  const headers = {
-    key: roles.issuer.key
-  }
+  const headers = apiHeaders
+  headers.key = roles.issuer.key
   const didResp = await fetch(`${config.issuer_api}/example-did`, { headers })
   const holder = {
     did: await didResp.text()
@@ -64,10 +63,7 @@ async function getOffer(path) {
   }
   const credParams = {
     method: 'POST',
-    headers: {
-      "Accept-Encoding": "gzip, br, identity", // avoid deflate
-      "Content-Type": "application/json",
-    },
+    headers: apiHeaders,
     body: JSON.stringify(requestBody)
   }
   // console.log(JSON.stringify(pensionCredential, null, 1))

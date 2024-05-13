@@ -1,7 +1,7 @@
 import { createServer } from 'node:http'
 import QRCode from 'qrcode'
 import { v4 as uuidv4 } from 'uuid'
-import { config } from './init.js'
+import { apiHeaders, config } from './init.js'
 
 const states = {}
 const pollingInterval = 3 // seconds
@@ -48,14 +48,14 @@ async function createRequest(id) {
   }
   const requestParams = {
     method: 'POST',
-    headers: {
+    headers: Object.assign(apiHeaders, {
       "Accept": "*/*",
       "authorizeBaseUrl": "openid4vp://authorize",
       "responseMode": "direct_post",
       "successRedirectUri": `${config.verifier_base}/success?id=${id}`,
       "errorRedirectUri": `${config.verifier_base}/error?id=${id}`,
       "Content-Type": "application/json",
-    },
+    }),
     body: JSON.stringify(requestBody)
   }
   // console.log(JSON.stringify(requestBody, null, 1))
@@ -235,7 +235,7 @@ async function getStatus(id) {
     return false
   }
   const statusUrl = `${config.verifier_api}/openid4vc/session/${states[id]}`
-  const resp = await fetch(statusUrl)
+  const resp = await fetch(statusUrl, { headers: apiHeaders })
   // console.log(statusUrl, resp.status)
   if (resp.status != 200) {
     console.error(JSON.stringify(await resp.text(), null, 1))

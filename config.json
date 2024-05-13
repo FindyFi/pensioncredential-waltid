@@ -1,4 +1,7 @@
 {
+    "keycloak_username": "your-password",
+    "keycloak_password": "your-password",
+    "token_url": "https://id.keycloak.findy.fi/realms/findy/protocol/openid-connect/token",
     "issuer_api": "https://issuer.waltid.findy.fi",
     "verifier_api": "https://verifier.waltid.findy.fi",
     "verifier_base": "https://verifier.waltid.pensiondemo.findy.fi",

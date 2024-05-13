@@ -1,5 +1,6 @@
 import sqlite3 from 'sqlite3'
 import config from './config.json' assert {'type': 'json'}
+import auth from './auth.js'
 
 const issuerName = 'Kela'
 const issuerImage = 'https://www.kela.fi/documents/20124/410402/logo-kela-rgb.png/50cdb366-b094-027e-2ac2-0439af6dc529?t=1643974848905'
@@ -15,9 +16,16 @@ for (const param in config) {
     }
 }
 
+const auth_token = await auth()
+const apiHeaders = {
+  'Accept': 'application/json',
+  'Authorization': auth_token,
+  'Content-Type': 'application/json'
+}
+
 const db = await openDB()
 const roles = await initRoles()
-export { config, db, roles }
+export { config, db, roles, apiHeaders }
 
 function openDB() {
     return new Promise((resolve, reject) => {
