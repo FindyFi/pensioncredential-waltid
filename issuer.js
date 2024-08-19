@@ -3,21 +3,12 @@ import { config, roles, apiHeaders } from './init.js'
 
 // console.log(roles)
 
-async function getHolderDid() {
-  const headers = apiHeaders
-  headers.key = roles.issuer.key
-  const didResp = await fetch(`${config.issuer_api}/example-did`, { headers })
-  const holder = {
-    did: await didResp.text()
-  }
-  return holder
-}
-
 async function getOffer(path) {
-  const holder = await getHolderDid()
+  console.log(path)
   const issueUrl = `${config.issuer_api}/openid4vc/sdjwt/issue`
   const { default: credential } = await import('.' + path, { assert: { type: "json" } });
-  console.log(credential)
+  // console.log(credential)
+  credential.credentialSubject.id = "did:key:123"
   const requestBody = {
     "issuanceKey": JSON.parse(roles.issuer.key),
     "issuerDid": roles.issuer.did,
@@ -27,10 +18,10 @@ async function getOffer(path) {
       "issuer": {
         "type": ["Profile"],
         "id": "<issuerDid>",
-        "name": roles['issuer'].name,
+        "name": roles.issuer.name,
       },
       "credentialSubject": {
-        "id": holder.did
+        "id": "<subjectDid>"
       },
       "issuanceDate": "<timestamp>",
       "expirationDate": "<timestamp-in:31d>"
@@ -61,13 +52,14 @@ async function getOffer(path) {
       }
     }
   }
+  // console.log(JSON.stringify(requestBody, null, 1))
   const credParams = {
     method: 'POST',
     headers: apiHeaders,
     body: JSON.stringify(requestBody)
   }
   // console.log(JSON.stringify(pensionCredential, null, 1))
-  console.log(issueUrl, JSON.stringify(credParams, null, 1))
+  // console.log(issueUrl, JSON.stringify(credParams, null, 1))
   const resp = await fetch(issueUrl, credParams)
   const credentialOffer = await resp.text()
   // console.log(resp.status, credentialOffer)
@@ -87,6 +79,7 @@ const sendOffer = async function (req, res) {
     catch(e) {
       res.writeHead(404)
       res.end(`${path} not found!`)
+      throw new Error(e)
       return false  
     }
   }

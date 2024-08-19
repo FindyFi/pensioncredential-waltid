@@ -5,9 +5,10 @@ import auth from './auth.js'
 const issuerName = 'Kela'
 const issuerImage = 'https://www.kela.fi/documents/20124/410402/logo-kela-rgb.png/50cdb366-b094-027e-2ac2-0439af6dc529?t=1643974848905'
 const issuerUrl = 'https://kela.fi'
-const verifierName = 'HSL'
-const verifierUrl = 'https://hsl.fi'
-const verifierImage = 'https://cdn-assets-cloud.frontify.com/s3/frontify-cloud-files-us/eyJwYXRoIjoiZnJvbnRpZnlcL2FjY291bnRzXC8yZFwvMTkyOTA4XC9wcm9qZWN0c1wvMjQ5NjY1XC9hc3NldHNcL2UzXC80NTY4ODQ2XC9lMjY2Zjg2NTU1Y2VjMGExZGM4ZmVkNDRiODdiMTNjNi0xNTk1NDI5MTAxLnN2ZyJ9:frontify:B-Us_1Aj3DJ5FKHvjZX1S0UOpg5wCFDIv4CNfy6rXQY?width=2400'
+const issuerDidWebDomain = 'kela.fi'
+// const verifierName = 'HSL'
+// const verifierUrl = 'https://hsl.fi'
+// const verifierImage = 'https://cdn-assets-cloud.frontify.com/s3/frontify-cloud-files-us/eyJwYXRoIjoiZnJvbnRpZnlcL2FjY291bnRzXC8yZFwvMTkyOTA4XC9wcm9qZWN0c1wvMjQ5NjY1XC9hc3NldHNcL2UzXC80NTY4ODQ2XC9lMjY2Zjg2NTU1Y2VjMGExZGM4ZmVkNDRiODdiMTNjNi0xNTk1NDI5MTAxLnN2ZyJ9:frontify:B-Us_1Aj3DJ5FKHvjZX1S0UOpg5wCFDIv4CNfy6rXQY?width=2400'
 
 // override config file with environment variables
 for (const param in config) {
@@ -23,10 +24,10 @@ const apiHeaders = {
   'Content-Type': 'application/json'
 }
 
+
 const db = await openDB()
 const roles = await initRoles()
 export { config, db, roles, apiHeaders }
-
 function openDB() {
     return new Promise((resolve, reject) => {
         const db = new sqlite3.Database(config.db_file, (err) => {
@@ -36,7 +37,7 @@ function openDB() {
                 id INTEGER PRIMARY KEY,
                 name varchar(50),
                 role varchar(20),
-                key INTEGER,
+                key varchar(2048),
                 did VARCHAR(500),
                 url VARCHAR(500),
                 image VARCHAR(500)
@@ -51,36 +52,44 @@ function openDB() {
 
 function initRoles() {
     return new Promise((resolve, reject) => {
-        const selectOrganizations = "SELECT id, name, role, key, did FROM organizations;"
+        const selectOrganizations = "SELECT id, name, role, key, did, url, image FROM organizations;"
         const roles = {}
         db.all(selectOrganizations, [], async (err, rows) => {
             if (err) throw err;
             rows.forEach((row) => {
-                // row.key = JSON.parse(row.key)
                 roles[row.role] = row
             })
-            if (roles.issuer?.did && roles.verifier?.did) {
+            if (roles.issuer?.did) {
                 resolve(roles)
                 return
             }
-            for (let role of ['issuer', 'verifier']) {
-                if (!roles[role]) {
-                    // console.log(`Creating ${role}`)
-                    // console.log(`${config.issuer_api}/example-key`)
-                    const resp = await fetch(`${config.issuer_api}/example-key`)
-                    const jwk = await resp.json()
-                    const org = {
-                        name: role == 'issuer' ? issuerName : verifierName,
-                        role: role,
-                        key: JSON.stringify(jwk),
-                        url: role == 'issuer' ? issuerUrl : verifierUrl,
-                        image: role == 'issuer' ? issuerImage : verifierImage,
+            if (!roles.issuer) {
+                const headers = apiHeaders
+                const body = JSON.stringify({
+                    "key": {
+                        "backend": "jwk",
+                        "keyType": "secp256k1"
+                    },
+                    "did": {
+                        "method": "jwk"
+                        // "method": "web",
+                        // "config": {
+                        //     "domain": issuerDidWebDomain
+                        // }
                     }
-                    roles[role] = await createOrganization(org)
+                })
+                const resp = await fetch(`${config.issuer_api}/onboard/issuer`, { method: "POST", headers, body } )
+                // console.log(`${config.issuer_api}/onboard/issuer`, { method: "POST", headers, body } )
+                const json = await resp.json()
+                const org = {
+                    name: issuerName,
+                    role: 'issuer',
+                    key: JSON.stringify(json.issuerKey),
+                    did: json.issuerDid,
+                    url: issuerUrl,
+                    image: issuerImage,
                 }
-                if (!roles[role].did) {
-                    roles[role] = await createDid(roles[role])
-                }
+                roles.issuer = await createOrganization(org)
             }
             resolve(roles)
         })
@@ -88,12 +97,13 @@ function initRoles() {
 }
 
 function createOrganization(org) {
-    const insertOrganization = db.prepare("REPLACE INTO organizations (name, role, key, url, image) VALUES (?, ?, ?, ?, ?);")
+    const insertOrganization = db.prepare("REPLACE INTO organizations (name, role, key, did, url, image) VALUES (?, ?, ?, ?, ?, ?);")
     return new Promise((resolve, reject) => {
         const values = [
             org.name,
             org.role,
             org.key,
+            org.did,
             org.url,
             org.image
         ]
@@ -103,25 +113,6 @@ function createOrganization(org) {
                 return
             }
             org.id = this.lastID
-            resolve(org)
-        })
-    })
-}
-
-function createDid(org) {
-    const updateOrganization = "UPDATE organizations SET did = ? WHERE id = ?;"
-    return new Promise(async (resolve, reject) => {
-        const headers = {
-            key: org.key
-        }
-        const resp = await fetch(`${config.issuer_api}/example-did`, { headers })
-        org.did = await resp.text()
-        console.log(org.did)
-        db.run(updateOrganization, [org.did, org.id], function (err) {
-            if (err) {
-                reject(err)
-                return
-            }
             resolve(org)
         })
     })
