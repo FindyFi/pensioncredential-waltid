@@ -6,13 +6,18 @@ import { config, roles, apiHeaders } from './init.js'
 async function getOffer(path) {
   console.log(path)
   const issueUrl = `${config.issuer_api}/openid4vc/sdjwt/issue`
-  const { default: credential } = await import('.' + path, { assert: { type: "json" } });
+  const { default: credential } = await import('.' + path, { with: { type: "json" } });
   // console.log(credential)
+  const issuerKey = JSON.parse(roles.issuer.key)
+  issuerKey.jwk = JSON.parse(issuerKey.jwk)
+  console.log(typeof roles.issuer.key)
+  console.log(roles.issuer.key)
   credential.credentialSubject.id = "did:key:123"
   const requestBody = {
-    "issuanceKey": JSON.parse(roles.issuer.key),
+    "issuerKey": issuerKey,
     "issuerDid": roles.issuer.did,
-    "vc": credential,
+    "credentialConfigurationId": "pensionCredential",
+    "credentialData": credential,
     "mapping": {
       "id": "<uuid>",
       "issuer": {
@@ -50,17 +55,23 @@ async function getOffer(path) {
           }
         }
       }
-    }
+    },
+    "authenticationMethod": "PRE_AUTHORIZED"
   }
-  // console.log(JSON.stringify(requestBody, null, 1))
+  console.log(JSON.stringify(requestBody, null, 1))
   const credParams = {
     method: 'POST',
     headers: apiHeaders,
     body: JSON.stringify(requestBody)
   }
   // console.log(JSON.stringify(pensionCredential, null, 1))
-  // console.log(issueUrl, JSON.stringify(credParams, null, 1))
   const resp = await fetch(issueUrl, credParams)
+  if (resp.status != 200) {
+    console.error(resp.status, issueUrl, JSON.stringify(credParams, null, 1))
+    const err = await resp.json()
+    console.log(err)
+    throw new Error(err)
+  }
   const credentialOffer = await resp.text()
   // console.log(resp.status, credentialOffer)
   return credentialOffer
@@ -79,7 +90,7 @@ const sendOffer = async function (req, res) {
     catch(e) {
       res.writeHead(404)
       res.end(`${path} not found!`)
-      throw new Error(e)
+      // throw new Error(e)
       return false  
     }
   }
@@ -130,6 +141,12 @@ const sendOffer = async function (req, res) {
     console.log(file)
     const resp = await fetch(file)
     let qrUrl = await resp.text()
+    if (resp.status != 200) {
+      console.error(resp.status, file, qrUrl)
+      document.querySelector('#instructions').textContent = 'Harmin paikka! Jotain meni pieleen...'
+      o.textContent = ''
+      return false
+    }
     console.log(qrUrl)
     const canvas = document.getElementById("qrcode")
     const qr = QRCode.QRCodeBrowser(canvas)
