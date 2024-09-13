@@ -8,13 +8,9 @@ async function getOffer(path) {
   const issueUrl = `${config.issuer_api}/openid4vc/sdjwt/issue`
   const { default: credential } = await import('.' + path, { with: { type: "json" } });
   // console.log(credential)
-  const issuerKey = JSON.parse(roles.issuer.key)
-  issuerKey.jwk = JSON.parse(issuerKey.jwk)
-  console.log(typeof roles.issuer.key)
-  console.log(roles.issuer.key)
   credential.credentialSubject.id = "did:key:123"
   const requestBody = {
-    "issuerKey": issuerKey,
+    "issuerKey": JSON.parse(roles.issuer.key),
     "issuerDid": roles.issuer.did,
     "credentialConfigurationId": "pensionCredential",
     "credentialData": credential,
@@ -58,7 +54,7 @@ async function getOffer(path) {
     },
     "authenticationMethod": "PRE_AUTHORIZED"
   }
-  console.log(JSON.stringify(requestBody, null, 1))
+  // console.log(JSON.stringify(requestBody, null, 1))
   const credParams = {
     method: 'POST',
     headers: apiHeaders,
