@@ -1,5 +1,5 @@
 import sqlite3 from 'sqlite3'
-import config from './config.json' assert {'type': 'json'}
+import config from './config.json' with {'type': 'json'}
 import auth from './auth.js'
 
 const issuerName = 'Kela'
