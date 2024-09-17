@@ -11,7 +11,7 @@ async function createRequest(id) {
   const requestUrl = `${config.verifier_api}/openid4vc/verify`
   const requestBody = {
     "request_credentials": [
-      "PensionCredential"
+      "PensionCredential_vc+sd-jwts"
     ],
     "presentation_definition": {
       "id": "<automatically assigned>",
