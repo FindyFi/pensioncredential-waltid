@@ -12,7 +12,7 @@ async function getOffer(path) {
   const requestBody = {
     "issuerKey": JSON.parse(roles.issuer.key),
     "issuerDid": roles.issuer.did,
-    "credentialConfigurationId": "pensionCredential",
+    "credentialConfigurationId": "PensionCredential_vc+sd-jwt",
     "credentialData": credential,
     "mapping": {
       "id": "<uuid>",
@@ -40,10 +40,10 @@ async function getOffer(path) {
                 "sd": false,
                 "children": {
                   "fields": {
-                    "person_identifier_code": { "sd": true },
+                    "personal_administrative_number": { "sd": true },
                     "birth_date": { "sd": true },
-                    "family_name_national_characters": { "sd": true },
-                    "given_name_national_characters": { "sd": true },
+                    "family_name": { "sd": true },
+                    "given_name": { "sd": true },
                   }
                 }
               }

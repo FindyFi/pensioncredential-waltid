@@ -22,22 +22,22 @@ async function createRequest(id) {
           "fields": [
             {
               "path": [
-                "$.credentialSubject.Person.givenName",
+                "$.credentialSubject.Person.given_name",
               ]
             },
             {
               "path": [
-                "$.credentialSubject.Person.familyName",
+                "$.credentialSubject.Person.family_name",
               ]
             },
             {
               "path": [
-                "$.credentialSubject.Person.birthDate",
+                "$.credentialSubject.Person.birth_date",
               ]
             },
             {
               "path": [
-                "$.credentialSubject.Pension.statusCode",
+                "$.credentialSubject.Pension.typeCode",
               ]
             },
           ],
@@ -150,7 +150,7 @@ async function showRequest(res) {
       const credential = credentialPolicies?.at(0)?.result?.credentialSubject
       const html = \`<p>Todisteen tarkistuksen tila: <strong>\${status.verificationResult}</strong></p>
       <table>
-      <tr><th>Hetu</th><td>\${attributes?.person_identifier_code}</td></tr>
+      <tr><th>Hetu</th><td>\${attributes?.personal_administrative_number}</td></tr>
       <tr><th>Eläke</th><td>\${attributes?.Pension?.typeCode}</td></tr>
       <tr><th>Alkamispäivä</th><td>\${attributes?.Pension?.startDate}</td></tr>
       </table>
@@ -188,7 +188,7 @@ function renderCredential(sdjwt) {
     attributes[decoded[1]] = decoded[2]
   }
   const html = `<table>
-    <tr><th>Hetu</th><td>${attributes?.person_identifier_code}</td></tr>
+    <tr><th>Hetu</th><td>${attributes?.personal_administrative_number}</td></tr>
     <tr><th>Eläke</th><td>${attributes?.Pension?.typeCode}</td></tr>
     <tr><th>Alkamispäivä</th><td>${attributes?.Pension?.startDate}</td></tr>
     </table>`
