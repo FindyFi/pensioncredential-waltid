@@ -17,17 +17,23 @@ for (const param in config) {
     }
 }
 
-const auth_token = await auth()
 const apiHeaders = {
   'Accept': 'application/json',
-  'Authorization': auth_token,
   'Content-Type': 'application/json'
 }
-
-
+authenticate()
 const db = await openDB()
 const roles = await initRoles()
 export { config, db, roles, apiHeaders }
+
+
+async function authenticate() {
+    const json = await auth()
+    apiHeaders.Authorization = `Bearer ${json.access_token}`
+    setTimeout(authenticate, json.refresh_expires_in * 1000) // no refresh but reauthentication...
+}
+
+
 function openDB() {
     return new Promise((resolve, reject) => {
         const db = new sqlite3.Database(config.db_file, (err) => {

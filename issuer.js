@@ -1,4 +1,5 @@
 import { createServer } from 'node:http'
+import auth from './auth.js'
 import { config, roles, apiHeaders } from './init.js'
 
 // console.log(roles)
@@ -62,6 +63,11 @@ async function getOffer(path) {
   }
   // console.log(JSON.stringify(pensionCredential, null, 1))
   const resp = await fetch(issueUrl, credParams)
+  if (resp.status == 401) {
+    const json = await auth()
+    apiHeaders.Authorization = `Bearer ${json.access_token}`
+    return getOffer(path) // possible recursion!
+  }
   if (resp.status != 200) {
     console.error(resp.status, issueUrl, JSON.stringify(credParams, null, 1))
     const err = await resp.json()

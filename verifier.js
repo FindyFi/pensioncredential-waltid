@@ -1,6 +1,7 @@
 import { createServer } from 'node:http'
 import QRCode from 'qrcode'
 import { v4 as uuidv4 } from 'uuid'
+import auth from './auth.js'
 import { apiHeaders, config } from './init.js'
 
 const states = {}
@@ -61,6 +62,11 @@ async function createRequest(id) {
   // console.log(JSON.stringify(requestBody, null, 1))
   // console.log(requestUrl, JSON.stringify(requestParams, null, 1))
   const resp = await fetch(requestUrl, requestParams)
+  if (resp.status == 401) {
+    const json = await auth()
+    apiHeaders.Authorization = `Bearer ${json.access_token}`
+    return createRequest(id) // possible recursion!
+  }
   if (resp.status != 200) {
     console.log(resp.status, requestUrl, JSON.stringify(requestParams, null, 1))
   }
@@ -237,6 +243,11 @@ async function getStatus(id) {
   const statusUrl = `${config.verifier_api}/openid4vc/session/${states[id]}`
   const resp = await fetch(statusUrl, { headers: apiHeaders })
   // console.log(statusUrl, resp.status)
+  if (resp.status == 401) {
+    const json = await auth()
+    apiHeaders.Authorization = `Bearer ${json.access_token}`
+    return getStatus(id) // possible recursion!
+  }
   if (resp.status != 200) {
     console.error(JSON.stringify(await resp.text(), null, 1))
     return false
