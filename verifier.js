@@ -149,7 +149,8 @@ async function showRequest(res) {
       console.log(sdjwt)
       const disclosures = sdjwt.split('~')
       disclosures.splice(0, 1) // discard jwt
-      console.log(disclosures)
+      disclosures.pop() // discard jwk
+      // console.log(disclosures)
       const attributes = {}
       for (const d of disclosures) {
         try {
@@ -162,7 +163,7 @@ async function showRequest(res) {
           console.warn(e)
         }
       }
-      console.log(attributes)
+      // console.log(attributes)
       const html = \`<p>Todisteen tarkistuksen tila: <strong>\${status.verificationResult}</strong></p>
       <table>
       <tr><th>Hetu</th><td>\${attributes?.personal_administrative_number}</td></tr>
@@ -174,6 +175,7 @@ async function showRequest(res) {
       c.ondblclick = function(e) {
        this.classList.toggle('full')
       }
+/*
       const t = document.createElement('table')
       let trs = \`<tr><th>Tarkastus</th><th>Tulos</th></tr>\`
       for (const policy of presentationPolicies) {
@@ -184,6 +186,7 @@ async function showRequest(res) {
       }
       t.innerHTML = trs
       c.appendChild(t)
+*/
      }
     }
    }
