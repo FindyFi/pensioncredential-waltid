@@ -13,7 +13,7 @@ async function getOffer(path) {
   const requestBody = {
     "issuerKey": JSON.parse(roles.issuer.key),
     "issuerDid": roles.issuer.did,
-    "credentialConfigurationId": "PensionCredential_vc+sd-jwt",
+    "credentialConfigurationId": `${config.credentialType}_${config.credentialFormat}`,
     "credentialData": credential,
     "mapping": {
       "id": "<uuid>",

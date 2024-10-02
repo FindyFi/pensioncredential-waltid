@@ -11,15 +11,19 @@ async function createRequest(id) {
   const requestUrl = `${config.verifier_api}/openid4vc/verify`
   const requestBody = {
     "request_credentials": [
-      "PensionCredential_vc+sd-jwts"
+      {
+        "format": config.credentialFormat,
+        "vct": `${config.issuer_api}/${config.credentialType}`
+      }
     ],
     "presentation_definition": {
-      "id": "<automatically assigned>",
-      "name": "Eläketodiste",
-      "purpose": "HSL:n eläkealennusoikeuden rekisteröintiin",
+      "id": uuidv4(),
       "input_descriptors": [{
-        "id": "Kela-HSL",
+        "id": `${config.credentialType}_${config.credentialFormat}`,
+        "name": config.credentialType, // "Eläketodiste" (?)
+        "purpose": "HSL:n eläkealennusoikeuden rekisteröintiin",
         "constraints": {
+/*
           "fields": [
             {
               "path": [
@@ -42,6 +46,7 @@ async function createRequest(id) {
               ]
             },
           ],
+ */
           "limit_disclosure": "required"
         }
       }]
@@ -276,6 +281,7 @@ const handleRequests = async function (req, res) {
         res.setHeader("Content-Type", "text/plain")
         res.writeHead(500)
         res.end(`Virhe käsiteltäessä tapahtumaa ${id}`)
+        return false
       }
       res.setHeader("Content-Type", "application/json")
       res.writeHead(200)
