@@ -200,6 +200,7 @@ function renderCredential(sdjwt) {
   console.log(sdjwt)
   const disclosures = sdjwt.split('~')
   disclosures.splice(0, 1) // discard jwt
+  disclosures.pop() // discard jwk
   const attributes = {}
   for (const d of disclosures) {
     const decoded = JSON.parse(atob(d))
