@@ -146,7 +146,7 @@ async function showRequest(res) {
       // console.log(JSON.stringify(status, null, 1))
       const policyResult = status.policyResults?.results?.at(0)
       const sdjwt = policyResult.credential
-      console.log(sdjwt)
+      // console.log(sdjwt)
       const disclosures = sdjwt.split('~')
       disclosures.splice(0, 1) // discard jwt
       disclosures.pop() // discard jwk
@@ -214,8 +214,15 @@ function renderCredential(sdjwt) {
 }
 
 async function showSuccess(id, res) {
+  console.log(`Success! Getting status for ${id}`)
   const status = await getStatus(id)
   console.log(JSON.stringify(status, null, 2))
+  if (!status) {
+    res.setHeader('Content-Type', 'text/plain; chaset="UTF-8"')
+    res.writeHead(404)
+    res.end(`Ei löytynyt tietoja tapahtumalle ${id}`)
+    return false
+  }
   const policyResult = status.policyResults?.results?.at(0)
   const sdjwt = policyResult.credential
   let html
@@ -275,7 +282,7 @@ const handleRequests = async function (req, res) {
   console.log(fullUrl.pathname, id)
   switch (fullUrl.pathname) {
     case '/error':
-      res.setHeader("Content-Type", "text/plain")
+      res.setHeader('Content-Type', 'text/plain; chaset="UTF-8"')
       res.writeHead(500)
       res.end(`Virhe käsiteltäessä tapahtumaa ${id}`)
       return false
@@ -285,7 +292,7 @@ const handleRequests = async function (req, res) {
     case '/status':
       const status = await getStatus(id)
       if (!status) {
-        res.setHeader("Content-Type", "text/plain")
+        res.setHeader('Content-Type', 'text/plain; chaset="UTF-8"')
         res.writeHead(500)
         res.end(`Virhe käsiteltäessä tapahtumaa ${id}`)
         return false
