@@ -152,9 +152,15 @@ async function showRequest(res) {
       console.log(disclosures)
       const attributes = {}
       for (const d of disclosures) {
-        const decoded = JSON.parse(atob(d))
-        // console.log(decoded[1], decoded[2])
-        attributes[decoded[1]] = decoded[2]
+        try {
+          const decoded = JSON.parse(atob(d))
+          // console.log(decoded[1], decoded[2])
+          attributes[decoded[1]] = decoded[2]
+        }
+        catch(e) {
+          console.warn(\`Unable to parse disclosure '\${d}'\`)
+          console.warn(e)
+        }
       }
       console.log(attributes)
       const html = \`<p>Todisteen tarkistuksen tila: <strong>\${status.verificationResult}</strong></p>
