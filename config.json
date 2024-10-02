@@ -5,6 +5,8 @@
     "issuer_api": "https://issuer.waltid.test.findy.fi",
     "verifier_api": "https://verifier.waltid.test.findy.fi",
     "verifier_base": "https://verifier.waltid.pensiondemo.findy.fi",
+    "credentialType": "PensionCredential",
+    "credentialFormat": "vc+sd-jwt",
     "db_file": "database.sqlite",
     "server_host": "localhost",
     "issuer_port": 6080,
