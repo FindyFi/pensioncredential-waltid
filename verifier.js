@@ -144,21 +144,19 @@ async function showRequest(res) {
      if (status.verificationResult) {
       clearInterval(timer)
       // console.log(JSON.stringify(status, null, 1))
-      const presentationPolicies = status.policyResults?.results?.at(0)?.policies
-      const sdjwt = presentationPolicies?.at(0)?.result?.vp?.verifiableCredential?.at(0)
-      // console.log(sdjwt)
+      const policyResult = status.policyResults?.results?.at(0)
+      const sdjwt = policyResult.credential
+      console.log(sdjwt)
       const disclosures = sdjwt.split('~')
       disclosures.splice(0, 1) // discard jwt
-      // console.log(disclosures)
+      console.log(disclosures)
       const attributes = {}
       for (const d of disclosures) {
         const decoded = JSON.parse(atob(d))
         // console.log(decoded[1], decoded[2])
         attributes[decoded[1]] = decoded[2]
       }
-      // console.log(attributes)
-      const credentialPolicies = status.policyResults?.results?.at(1)?.policies
-      const credential = credentialPolicies?.at(0)?.result?.credentialSubject
+      console.log(attributes)
       const html = \`<p>Todisteen tarkistuksen tila: <strong>\${status.verificationResult}</strong></p>
       <table>
       <tr><th>Hetu</th><td>\${attributes?.personal_administrative_number}</td></tr>
@@ -209,14 +207,14 @@ function renderCredential(sdjwt) {
 async function showSuccess(id, res) {
   const status = await getStatus(id)
   console.log(JSON.stringify(status, null, 2))
-  const presentationPolicies = status.policyResults?.results?.at(0)?.policies
-  const sdjwt = presentationPolicies?.at(0)?.result?.vp?.verifiableCredential?.at(0)
+  const policyResult = status.policyResults?.results?.at(0)
+  const sdjwt = policyResult.credential
   let html
   if (sdjwt) {
     html = `<h2>Tiedot:</h2>\n${renderCredential(sdjwt)}`
   }
   else {
-    html = `<h2>VIRHE:</h2>\n<pre>${JSON.stringify(status, null, 1)}</pre>`
+    html = `<h2>VIRHE:</h2>\n<pre style="text-align: left">${JSON.stringify(status, null, 1)}</pre>`
   }
   console.log(id, status)
   res.setHeader("Content-Type", "text/html")
