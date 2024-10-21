@@ -81,7 +81,13 @@ async function getOffer(path) {
 
 const sendOffer = async function (req, res) {
   const path = new URL(`http://${config.server_host}${req.url}`).pathname
-  if (path.includes('.json')) {
+  if (path == '/.well-known/openid-federation') {
+    res.setHeader("Content-Type", "application/entity-statement+jwt")
+    res.writeHead(200)
+    res.end(config.issuer_entity_configuration)
+    return false
+  }
+  else if (path.includes('.json')) {
     res.setHeader("Content-Type", "text/plain")
     try {
       const offerUri = await getOffer(path)
