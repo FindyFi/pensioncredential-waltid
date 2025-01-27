@@ -53,7 +53,8 @@ async function getOffer(path) {
         }
       }
     },
-    "authenticationMethod": "PRE_AUTHORIZED"
+    "authenticationMethod": "PRE_AUTHORIZED",
+    "standardVersion": config.oid4vci_version
   }
   // console.log(JSON.stringify(requestBody, null, 1))
   const credParams = {

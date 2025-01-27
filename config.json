@@ -1,6 +1,7 @@
 {
     "keycloak_username": "your-username",
     "keycloak_password": "your-password",
+    "oid4vci_version": "DRAFT13",
     "token_url": "https://id.keycloak.findy.fi/realms/findy/protocol/openid-connect/token",
     "issuer_api": "https://issuer.waltid.test.findy.fi",
     "verifier_api": "https://verifier.waltid.test.findy.fi",
