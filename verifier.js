@@ -13,44 +13,40 @@ async function createRequest(id) {
     "request_credentials": [
       {
         "format": config.credentialFormat,
-        "vct": `${config.issuer_api}/${config.credentialType}`
-      }
-    ],
-    "presentation_definition": {
-      "id": uuidv4(),
-      "input_descriptors": [{
-        "id": `${config.credentialType}_${config.credentialFormat}`,
-        "name": config.credentialType, // "Eläketodiste" (?)
-        "purpose": "HSL:n eläkealennusoikeuden rekisteröintiin",
-        "constraints": {
-/*
-          "fields": [
-            {
-              "path": [
-                "$.credentialSubject.Person.given_name",
-              ]
-            },
-            {
-              "path": [
-                "$.credentialSubject.Person.family_name",
-              ]
-            },
-            {
-              "path": [
-                "$.credentialSubject.Person.birth_date",
-              ]
-            },
-            {
-              "path": [
-                "$.credentialSubject.Pension.typeCode",
-              ]
-            },
-          ],
- */
-          "limit_disclosure": "required"
+        "vct": `${config.issuer_api}/${config.credentialType}`,
+        "input_descriptor": {
+          "id": uuidv4(),
+          // "id": `${config.credentialType}_${config.credentialFormat}`,
+          "name": config.credentialType, // "Eläketodiste" (?)
+          "purpose": "HSL:n eläkealennusoikeuden rekisteröintiin",
+          "constraints": {
+            "fields": [
+              {
+                "path": [
+                  "$.Person.personal_administrative_number",
+                ],
+                "filter": {
+                  "type": "string",
+                  "pattern": ".*"
+                },
+                "optional": false
+              },
+              {
+                "path": [
+                  "$.Pension.typeCode",
+                ],
+                "filter": {
+                  "type": "string",
+                  "pattern": ".*"
+                },
+                "optional": false
+              },
+            ],
+            "limit_disclosure": "required"
+          }
         }
-      }]
-    }
+      }
+    ]
   }
   const requestParams = {
     method: 'POST',
@@ -85,13 +81,17 @@ async function createRequest(id) {
 async function showRequest(res) {
   const id = uuidv4()
   const credentialRequest = await createRequest(id)
-  const requestURL = credentialRequest
+  const searchParams = new URLSearchParams(new URL(credentialRequest).search)
+  const requestURL = searchParams.get('presentation_definition_uri')
+  const requestResponse = await fetch(requestURL)
+  const request = await requestResponse?.json()
   const dataURL = await QRCode.toDataURL(credentialRequest)
   res.setHeader("Content-Type", "text/html")
   res.writeHead(200)
   res.end(`<!DOCTYPE html>
 <html lang="en">
  <meta charset="UTF-8">
+ <meta http-equiv="origin-trial" content="Ao6trqrvq0CAiUXLvpfRFxFnxVBs6c5ugVIiCmixsxIwWZmaSerp7cx5O10/mYAXfpkfZK6j3Ks+KE9nCl9C9AQAAAByeyJvcmlnaW4iOiJodHRwczovL2ZpbmR5LmZpOjQ0MyIsImZlYXR1cmUiOiJXZWJJZGVudGl0eURpZ2l0YWxDcmVkZW50aWFscyIsImV4cGlyeSI6MTc1MzE0MjQwMCwiaXNTdWJkb21haW4iOnRydWV9">
  <title>walt.id vastaanottaa eläkeläistodisteen</title>
  <style>
    *[lang]:not([lang="en"]) {
@@ -174,6 +174,9 @@ async function showRequest(res) {
     display: none;
     text-align: left;
   }
+  #fallback {
+    display: none;
+  }
 
  </style>
  <body style="text-align: center;">
@@ -185,8 +188,10 @@ async function showRequest(res) {
   </header>
   <h1><span lang="fi">Hanki eläkeläisalennus</span><span lang="en">Get pensioner discount</span></h1>
   <div id="content">
-   <a href="${requestURL}"><img src="${dataURL}" alt="Credential Request QR Code" /></a>
-   <p><span lang="fi">Lue QR-koodi lompakkosovelluksellasi</span><span lang="en">Scan the QR code using your digital wallet</span></p>
+   <div id="fallback">
+    <a href="${credentialRequest}"><img src="${dataURL}" alt="Credential Request QR Code" /></a>
+    <p><span lang="fi">Lue QR-koodi lompakkosovelluksellasi</span><span lang="en">Scan the QR code using your digital wallet</span></p>
+   </div>
   </div>
   <script>
    const params = new URLSearchParams(document.location.search)
@@ -236,7 +241,7 @@ async function showRequest(res) {
    const c = document.querySelector('#content')
 /*
    const a = document.createElement('a')
-   a.href = '${requestURL}'
+   a.href = '${credentialRequest}'
    a.style.display = 'block'
    a.onclick = function(e) {
     e.preventDefault()
@@ -251,7 +256,32 @@ async function showRequest(res) {
    a.innerHTML = o
    c.appendChild(a)
 */
-
+   if (typeof window.DigitalCredential !== 'undefined') {
+    const b = document.createElement('button')
+    b.innerHTML = '<span lang="en">Display your pension credential</span><span lang="fi">Näytä eläketodiste</span>'
+    b.onclick = async function() {
+     try {
+      // create an Abort Controller
+      const controller = new AbortController()
+      const dcResponse = await navigator.credentials.get({
+       signal: controller.signal,
+       mediation: "required",
+       digital: {
+        requests: [{
+         protocol: "openid4vp",
+         data: ${JSON.stringify(request)}
+        }]
+       }
+      })
+     } catch (error) {
+      console.error(error.message)
+     }
+    }
+    c.appendChild(b)
+   }
+   else {
+    document.querySelector('#fallback').style.display = 'block';
+   }
    const uri = '/status?id=${id}'
    let timer
    async function checkStatus() {
