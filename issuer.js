@@ -9,7 +9,8 @@ async function getOffer(path) {
   const issueUrl = `${config.issuer_api}/openid4vc/sdjwt/issue`
   const { default: credential } = await import('.' + path, { with: { type: "json" } });
   // console.log(credential)
-  credential.credentialSubject.id = credential.credentialSubject.Person.personal_administrative_number
+  const subjectId = credential.credentialSubject.Person.personal_administrative_number
+  credential.credentialSubject.id = subjectId
   const requestBody = {
     "issuerKey": JSON.parse(roles.issuer.key),
     // "issuerDid": roles.issuer.did,
@@ -21,9 +22,6 @@ async function getOffer(path) {
         "type": ["Profile"],
         "id": roles.issuer.did,
         "name": roles.issuer.name,
-      },
-      "credentialSubject": {
-        "id": "<subjectDid>"
       },
       "issuanceDate": "<timestamp>",
       "expirationDate": "<timestamp-in:31d>"
