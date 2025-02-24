@@ -12,7 +12,7 @@ async function getOffer(path) {
   credential.credentialSubject.id = credential.credentialSubject.Person.personal_administrative_number
   const requestBody = {
     "issuerKey": JSON.parse(roles.issuer.key),
-    "issuerDid": roles.issuer.did,
+    // "issuerDid": roles.issuer.did,
     "credentialConfigurationId": `${config.credentialType}_${config.credentialFormat}`,
     "credentialData": credential,
     "mapping": {
