@@ -280,7 +280,8 @@ async function showRequest(res) {
     c.appendChild(b)
    }
    else {
-    document.querySelector('#fallback').style.display = 'block';
+    document.querySelector('#fallback').style.display = 'block'
+    c.appendChild(document.createTextNode('DC API not supported'))
    }
    const uri = '/status?id=${id}'
    let timer
