@@ -275,7 +275,7 @@ async function showRequest(res) {
        signal: controller.signal,
        mediation: "required",
        digital: {
-        requests: [{
+        providers: [{
          protocol: "openid4vp",
          data: ${JSON.stringify(request)}
         }]
