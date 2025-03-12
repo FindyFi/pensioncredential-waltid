@@ -280,9 +280,7 @@ async function showRequest(res) {
         }]
        }
       })
-      const pre = document.createElement('pre')
-      pre.style.border = '2px solid red'
-      pre.innerHTML = JSON.stringify(dcResponse, null, 1)
+      c.innerHTML += JSON.stringify(dcResponse, null, 1)
      } catch (error) {
       const pre = document.createElement('pre')
       pre.style.border = '2px solid red'
