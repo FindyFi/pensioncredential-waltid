@@ -267,7 +267,7 @@ async function showRequest(res) {
     const b = document.createElement('button')
     b.innerHTML = '<span lang="en">Display your pension credential</span><span lang="fi">Näytä eläketodiste</span>'
     b.onclick = async function() {
-     c.innerHTML += '${JSON.stringify(request)}'
+     // c.innerHTML += '${JSON.stringify(request)}'
      try {
       // create an Abort Controller
       const controller = new AbortController()
@@ -281,7 +281,7 @@ async function showRequest(res) {
         }]
        }
       })
-      c.innerHTML += JSON.stringify(dcResponse, null, 1)
+      // c.innerHTML += JSON.stringify(dcResponse, null, 1)
      } catch (error) {
       const pre = document.createElement('pre')
       pre.style.border = '2px solid red'
