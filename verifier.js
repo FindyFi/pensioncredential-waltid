@@ -263,10 +263,11 @@ async function showRequest(res) {
    a.innerHTML = o
    c.appendChild(a)
 */
-   if (typeof window.DigitalCredential !== 'undefined') {
+   if (1 || typeof window.DigitalCredential !== 'undefined') {
     const b = document.createElement('button')
     b.innerHTML = '<span lang="en">Display your pension credential</span><span lang="fi">Näytä eläketodiste</span>'
     b.onclick = async function() {
+     c.innerHTML += '${JSON.stringify(request)}'
      try {
       // create an Abort Controller
       const controller = new AbortController()
@@ -284,6 +285,7 @@ async function showRequest(res) {
      } catch (error) {
       const pre = document.createElement('pre')
       pre.style.border = '2px solid red'
+      pre.style.display = 'block'
       pre.innerHTML = error.message
       c.appendChild(pre)
      }
