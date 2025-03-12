@@ -277,7 +277,7 @@ async function showRequest(res) {
        digital: {
         providers: [{
          protocol: "openid4vp",
-         data: ${JSON.stringify(request)}
+         request: ${JSON.stringify(request)}
         }]
        }
       })
