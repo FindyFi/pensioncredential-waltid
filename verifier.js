@@ -263,7 +263,7 @@ async function showRequest(res) {
    a.innerHTML = o
    c.appendChild(a)
 */
-   if (1 || typeof window.DigitalCredential !== 'undefined') {
+   if (typeof window.DigitalCredential !== 'undefined') {
     const b = document.createElement('button')
     b.innerHTML = '<span lang="en">Display your pension credential</span><span lang="fi">Näytä eläketodiste</span>'
     b.onclick = async function() {
