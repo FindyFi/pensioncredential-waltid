@@ -23,7 +23,7 @@ async function createRequest(id) {
             "fields": [
               {
                 "path": [
-                  "$.Person.personal_administrative_number",
+                  "$..Person.personal_administrative_number",
                 ],
                 "filter": {
                   "type": "string",
@@ -33,7 +33,7 @@ async function createRequest(id) {
               },
               {
                 "path": [
-                  "$.Pension.typeCode",
+                  "$..Pension.typeCode",
                 ],
                 "filter": {
                   "type": "string",
