@@ -274,7 +274,10 @@ async function showRequest(res) {
        }
       })
      } catch (error) {
-      console.error(error.message)
+      const pre = document.createElement('pre')
+      pre.style.border = '2px solid red'
+      pre.innerHTML = error.message
+      c.appendChild(pre)
      }
     }
     c.appendChild(b)
