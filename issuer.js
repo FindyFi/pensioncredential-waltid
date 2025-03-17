@@ -11,6 +11,7 @@ async function getOffer(path) {
   // console.log(credential)
   const subjectId = credential.credentialSubject.Person.personal_administrative_number
   credential.credentialSubject.id = subjectId
+  credential.vct = `${config.credentialType}_${config.credentialFormat}`
   const requestBody = {
     "issuerKey": JSON.parse(roles.issuer.key),
     // "issuerDid": roles.issuer.did,
@@ -112,6 +113,7 @@ const sendOffer = async function (req, res) {
   res.end(`<!DOCTYPE html>
 <html lang="en">
  <meta charset="UTF-8">
+ <meta http-equiv="origin-trial" content="Ao6trqrvq0CAiUXLvpfRFxFnxVBs6c5ugVIiCmixsxIwWZmaSerp7cx5O10/mYAXfpkfZK6j3Ks+KE9nCl9C9AQAAAByeyJvcmlnaW4iOiJodHRwczovL2ZpbmR5LmZpOjQ0MyIsImZlYXR1cmUiOiJXZWJJZGVudGl0eURpZ2l0YWxDcmVkZW50aWFscyIsImV4cGlyeSI6MTc1MzE0MjQwMCwiaXNTdWJkb21haW4iOnRydWV9">
  <title>walt.id myöntää eläketodisteen</title>
  <script src="https://unpkg.com/@qrcode-js/browser"></script>
  <style>
