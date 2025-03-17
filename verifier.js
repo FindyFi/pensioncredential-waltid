@@ -181,9 +181,11 @@ async function showRequest(res) {
     display: none;
     text-align: left;
   }
+/*
   #fallback {
     display: none;
   }
+*/
 
  </style>
  <body style="text-align: center;">
@@ -282,6 +284,9 @@ async function showRequest(res) {
        }
       })
       // c.innerHTML += JSON.stringify(dcResponse, null, 1)
+      const data = credentialResponse.token || credentialResponse.data
+      const html = \`<pre style="display:block;">\${JSON.stringify(data, null, 2)}</pre>\`
+      c.innerHTML = html
      } catch (error) {
       const pre = document.createElement('pre')
       pre.style.border = '2px solid red'
@@ -293,8 +298,8 @@ async function showRequest(res) {
     c.appendChild(b)
    }
    else {
-    document.querySelector('#fallback').style.display = 'block'
-    c.appendChild(document.createTextNode('DC API not supported'))
+    // document.querySelector('#fallback').style.display = 'block'
+    // c.appendChild(document.createTextNode('DC API not supported'))
    }
    const uri = '/status?id=${id}'
    let timer
