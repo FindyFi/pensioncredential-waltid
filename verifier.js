@@ -18,6 +18,9 @@ async function createRequest(id) {
           "id": uuidv4(),
           // "id": `${config.credentialType}_${config.credentialFormat}`,
           "format": {
+            "dc+sd-jwt": {
+              "alg": ["sha-256", "secp256k1", "ES256", "ES256K", "PS256"],
+            },
             "vc+sd-jwt": {
               "alg": ["sha-256", "secp256k1", "ES256", "ES256K", "PS256"],
             }
