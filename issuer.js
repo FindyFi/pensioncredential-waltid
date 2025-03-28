@@ -14,7 +14,7 @@ async function getOffer(path) {
   credential.vct = `${config.credentialType}_${config.credentialFormat}`
   const requestBody = {
     "issuerKey": JSON.parse(roles.issuer.key),
-    // "issuerDid": roles.issuer.did,
+    "issuerDid": roles.issuer.did,
     "credentialConfigurationId": `${config.credentialType}_${config.credentialFormat}`,
     "credentialData": credential,
     "mapping": {
