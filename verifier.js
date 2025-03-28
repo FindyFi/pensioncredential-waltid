@@ -18,7 +18,9 @@ async function createRequest(id) {
           "id": uuidv4(),
           // "id": `${config.credentialType}_${config.credentialFormat}`,
           "format": {
-            "vc+sd-jwt": {}
+            "vc+sd-jwt": {
+              "alg": ["secp256k1", "sha-256", "ES256K"],
+            }
           },
           "name": config.credentialType, // "Eläketodiste" (?)
           "purpose": "HSL:n eläkealennusoikeuden rekisteröintiin",
