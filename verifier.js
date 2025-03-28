@@ -12,7 +12,15 @@ async function createRequest(id) {
   const requestBody = {
     "request_credentials": [
       {
-        "format": config.credentialFormat,
+        // "format": config.credentialFormat,
+        "format": {
+          "dc+sd-jwt": {
+            "alg": ["sha-256", "secp256k1", "ES256", "ES256K", "PS256"],
+          },
+          "vc+sd-jwt": {
+            "alg": ["sha-256", "secp256k1", "ES256", "ES256K", "PS256"],
+          }
+        },
         "vct": `${config.issuer_api}/${config.credentialType}`,
         "input_descriptor": {
           "id": uuidv4(),
