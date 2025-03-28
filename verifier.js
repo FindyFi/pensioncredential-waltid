@@ -19,7 +19,7 @@ async function createRequest(id) {
           // "id": `${config.credentialType}_${config.credentialFormat}`,
           "format": {
             "vc+sd-jwt": {
-              "alg": ["secp256k1", "sha-256", "ES256K"],
+              "alg": ["sha-256", "secp256k1", "ES256", "ES256K", "PS256"],
             }
           },
           "name": config.credentialType, // "Eläketodiste" (?)
