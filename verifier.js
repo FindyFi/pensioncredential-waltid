@@ -17,6 +17,9 @@ async function createRequest(id) {
         "input_descriptor": {
           "id": uuidv4(),
           // "id": `${config.credentialType}_${config.credentialFormat}`,
+          "format": {
+            "vc+sd-jwt": {}
+          },
           "name": config.credentialType, // "Eläketodiste" (?)
           "purpose": "HSL:n eläkealennusoikeuden rekisteröintiin",
           "constraints": {
