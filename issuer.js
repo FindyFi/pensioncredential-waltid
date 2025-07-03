@@ -113,7 +113,7 @@ const sendOffer = async function (req, res) {
   res.end(`<!DOCTYPE html>
 <html lang="en">
  <meta charset="UTF-8">
- <meta http-equiv="origin-trial" content="Ao6trqrvq0CAiUXLvpfRFxFnxVBs6c5ugVIiCmixsxIwWZmaSerp7cx5O10/mYAXfpkfZK6j3Ks+KE9nCl9C9AQAAAByeyJvcmlnaW4iOiJodHRwczovL2ZpbmR5LmZpOjQ0MyIsImZlYXR1cmUiOiJXZWJJZGVudGl0eURpZ2l0YWxDcmVkZW50aWFscyIsImV4cGlyeSI6MTc1MzE0MjQwMCwiaXNTdWJkb21haW4iOnRydWV9">
+ <meta http-equiv="origin-trial" content="AhoCO4GfnrssWa2A8grnhQNvLMdUhcH1dvSTYBvfRfKg40whSox1F9dTxevAbjS7cYn7gKzWI4fSVHp3kRXRAgQAAAByeyJvcmlnaW4iOiJodHRwczovL2ZpbmR5LmZpOjQ0MyIsImZlYXR1cmUiOiJXZWJJZGVudGl0eURpZ2l0YWxDcmVkZW50aWFscyIsImV4cGlyeSI6MTc2MDQwMDAwMCwiaXNTdWJkb21haW4iOnRydWV9">
  <title>walt.id myöntää eläketodisteen</title>
  <script src="https://unpkg.com/@qrcode-js/browser"></script>
  <style>
